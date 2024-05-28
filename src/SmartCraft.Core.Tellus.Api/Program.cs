@@ -11,6 +11,7 @@ using SmartCraft.Core.Tellus.Application.Client;
 using System.Reflection;
 using SmartCraft.Core.Tellus.Domain.Validators;
 using Serilog;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 var Configuration = builder.Configuration;
@@ -25,6 +26,7 @@ var logger = new LoggerConfiguration()
 builder.Logging.ClearProviders();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(logger, dispose: true));
 
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,6 +54,8 @@ builder.Services.AddApiVersioning(
 //DB
 builder.Services.AddDbContext<VehicleContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
 builder.Services.AddDbContext<TenantContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
+
+
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<HttpClient>();
@@ -83,6 +87,20 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 
 var app = builder.Build();
 
+
+// Migrate latest database changes during startup
+using (var scope = app.Services.CreateScope())
+{
+    var vehicleContext = scope.ServiceProvider
+        .GetRequiredService<VehicleContext>();
+    var tenantContext = scope.ServiceProvider
+        .GetRequiredService<TenantContext>();
+
+    // Here is the migration executed
+    vehicleContext.Database.Migrate();
+    tenantContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -95,6 +113,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthentication();
 
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();

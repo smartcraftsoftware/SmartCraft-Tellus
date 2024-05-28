@@ -9,18 +9,18 @@ using SmartCraft.Core.Tellus.Infrastructure.Context;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Tenant
 {
     [DbContext(typeof(TenantContext))]
-    [Migration("20240520132200_initalmigration")]
-    partial class initalmigration
+    [Migration("20240528142459_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -53,9 +53,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
                         .HasColumnType("text");
 
                     b.Property<string>("ScaniaSecretKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ScaniaToken")
                         .HasColumnType("text");
 
                     b.Property<string>("VolvoCredentials")

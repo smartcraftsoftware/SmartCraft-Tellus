@@ -1,18 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Tenant
 {
     /// <inheritdoc />
-    public partial class initalmigration : Migration
+    public partial class initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Users");
-
             migrationBuilder.CreateTable(
                 name: "Tenants",
                 columns: table => new
@@ -21,7 +19,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
                     VolvoCredentials = table.Column<string>(type: "text", nullable: true),
                     ScaniaClientId = table.Column<string>(type: "text", nullable: true),
                     ScaniaSecretKey = table.Column<string>(type: "text", nullable: true),
-                    ScaniaToken = table.Column<string>(type: "text", nullable: true),
                     ManToken = table.Column<string>(type: "text", nullable: true),
                     DaimlerToken = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -40,21 +37,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
         {
             migrationBuilder.DropTable(
                 name: "Tenants");
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    EmailAddress = table.Column<string>(type: "text", nullable: false),
-                    FullName = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
         }
     }
 }

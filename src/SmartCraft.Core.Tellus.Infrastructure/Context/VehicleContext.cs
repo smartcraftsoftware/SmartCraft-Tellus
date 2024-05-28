@@ -17,5 +17,4 @@ public class VehicleContext : DbContext
     public DbSet<StatusReport> StatusReports { get; set; }
     public DbSet<EsgVehicleReport> EsgVehicleReports { get; set;}
     public DbSet<VehicleEvaluation> VehicleEvaluations { get; set; }
-    public DbSet<Tenant> Tenants { get; set; }
 }

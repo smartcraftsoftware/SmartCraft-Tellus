@@ -13,15 +13,15 @@ using SmartCraft.Core.Tellus.Infrastructure.Context;
 namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 {
     [DbContext(typeof(VehicleContext))]
-    [Migration("20240515123418_updated some fields")]
-    partial class updatedsomefields
+    [Migration("20240528142559_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -164,11 +164,23 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
                     b.Property<string>("Brand")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("CustomerVehicleName")
                         .HasColumnType("text");
 
                     b.Property<string>("EmissionLevel")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastUpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<List<string>>("PossibleFuelTypes")
                         .HasColumnType("text[]");

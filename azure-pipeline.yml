@@ -24,7 +24,7 @@ stages:
       applicationName: tellus
       repository: 'sc-core/tellus'
       dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-      nugetfile: 'src/nuget.config'
-      testNugetfile: 'src/nuget.config'
+      nugetfile: ''
+      testNugetfile: ''
       buildContext: '$(Build.SourcesDirectory)'
       team: 'sc-core'

@@ -2,25 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Tenant
 {
     [DbContext(typeof(TenantContext))]
-    [Migration("20240520134316_initalmigration2")]
-    partial class initalmigration2
+    partial class TenantContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -53,9 +50,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.User
                         .HasColumnType("text");
 
                     b.Property<string>("ScaniaSecretKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ScaniaToken")
                         .HasColumnType("text");
 
                     b.Property<string>("VolvoCredentials")

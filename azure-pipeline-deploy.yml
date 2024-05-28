@@ -1,0 +1,20 @@
+trigger: none
+
+variables:
+  - group: common-deployment
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: SC Core Infrastructure/devops-pipeline-templates
+
+stages:
+  - stage: deploy
+    displayName: Deploying to ${{ variables.environment }}
+    jobs:
+      - template: templates/jobs/job-update-git-configuration-repo.yaml@templates
+        parameters:
+          environment: $(environment)
+          applicationName: tellus
+          team: sc-core

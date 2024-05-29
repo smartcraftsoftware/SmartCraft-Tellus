@@ -62,7 +62,7 @@ public class TenantServiceTest
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
         //Act
-        var result = await service.RegisterTenantAsync(tenant.ToDomainModel());
+        var result = await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel());
 
         //Assert
         Assert.Equal(tenant.Id, result);
@@ -80,7 +80,7 @@ public class TenantServiceTest
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
         //Act and Assert
-        Task<Exception> exc = Assert.ThrowsAsync<Exception>(async () => await service.RegisterTenantAsync(tenant.ToDomainModel()));
+        Task<Exception> exc = Assert.ThrowsAsync<Exception>(async () => await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel()));
         repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()),Times.Once);
     }
 

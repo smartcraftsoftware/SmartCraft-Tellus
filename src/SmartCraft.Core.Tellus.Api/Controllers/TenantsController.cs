@@ -10,7 +10,7 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:ApiVersion}/[controller]")]
-public class TenantController(ILogger<TenantController> logger, ITenantService service) : ControllerBase
+public class TenantsController(ILogger<TenantsController> logger, ITenantService service) : ControllerBase
 {
     /// <summary>
     /// Gets a tenant

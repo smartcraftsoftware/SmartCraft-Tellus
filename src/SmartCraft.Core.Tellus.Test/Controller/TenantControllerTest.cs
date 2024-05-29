@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class TenantControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<TenantController>> loggerMock = new();
+    private readonly Mock<Microsoft.Extensions.Logging.ILogger<TenantsController>> loggerMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();
 
     [Fact]
@@ -192,8 +192,8 @@ public class TenantControllerTest
 
 
 
-    private TenantController CreateController()
+    private TenantsController CreateController()
     {
-        return new TenantController(loggerMock.Object, tenantServiceMock.Object);
+        return new TenantsController(loggerMock.Object, tenantServiceMock.Object);
     }
 }

@@ -1,0 +1,435 @@
+openapi: 3.0.1
+info:
+  title: Tellus - A part of Smartcraft
+  description: Api to get ESG reports for vehicles.
+  version: v1
+paths:
+  '/api/v{version}/Tenants/{id}':
+    get:
+      tags:
+        - Tenants
+      summary: Gets a tenant
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns a tenant
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/GetTenantResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTenantResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/GetTenantResponse'
+        '404':
+          description: Could not find specified tenant
+        '500':
+          description: Internal server error
+    patch:
+      tags:
+        - Tenants
+      summary: Updates an existing tenant
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Tenant has been updated
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Tenants
+      summary: Deletes a tenant
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Tenant has been deleted
+        '404':
+          description: Could not find specified tenant
+        '500':
+          description: Internal server error
+  '/api/v{version}/Tenants':
+    post:
+      tags:
+        - Tenants
+      summary: Creates a tenant
+      parameters:
+        - name: tenantId
+          in: header
+          description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTenantRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AddTenantRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AddTenantRequest'
+      responses:
+        '200':
+          description: Tenant has been created
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+            application/json:
+              schema:
+                type: string
+                format: uuid
+            text/json:
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal server error
+  '/api/v{version}/Vehicles/{vehicleBrand}/vehicles':
+    get:
+      tags:
+        - Vehicles
+      summary: 'Gets a list of vehicles in current users'' fleet, based on the vehicle brand'
+      parameters:
+        - name: vehicleBrand
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: tenantId
+          in: header
+          description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns a vehicle status report
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetVehicleResponse'
+        '404':
+          description: Could not find vehicle
+        '500':
+          description: Internal server error
+  '/api/v{version}/Vehicles/{vehicleBrand}/esgreport':
+    get:
+      tags:
+        - Vehicles
+      summary: Gets ESG report for a vehicle
+      parameters:
+        - name: vehicleBrand
+          in: path
+          description: Brand of vehicle to fetch
+          required: true
+          schema:
+            type: string
+        - name: vinOrId
+          in: query
+          description: "Vin number or external id of vehicle. \r\n            If excluded, will fetch all vehicles of current user's fleet."
+          schema:
+            type: string
+        - name: startTime
+          in: query
+          description: Start time of interval
+          schema:
+            type: string
+            format: date-time
+        - name: stopTime
+          in: query
+          description: Stop time of interval
+          schema:
+            type: string
+            format: date-time
+        - name: tenantId
+          in: header
+          description: Id of tenant
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns a vehicle status report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgReportResponse'
+        '404':
+          description: Could not find vehicle
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    AddTenantRequest:
+      type: object
+      properties:
+        volvoCredentials:
+          type: string
+          nullable: true
+        scaniaClientId:
+          type: string
+          nullable: true
+        scaniaSecretKey:
+          type: string
+          nullable: true
+        manToken:
+          type: string
+          nullable: true
+        daimlerToken:
+          type: string
+          nullable: true
+      additionalProperties: false
+    EsgReportResponse:
+      required:
+        - vehicleEvaluations
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        stopTime:
+          type: string
+          format: date-time
+          nullable: true
+        vehicleEvaluations:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleEvaluationResponse'
+          nullable: true
+      additionalProperties: false
+    GetTenantResponse:
+      type: object
+      properties:
+        daimlerToken:
+          type: string
+          nullable: true
+        volvoCredentials:
+          type: string
+          nullable: true
+        scaniaSecretKey:
+          type: string
+          nullable: true
+        scaniaClientId:
+          type: string
+          nullable: true
+        manToken:
+          type: string
+          nullable: true
+      additionalProperties: false
+    GetVehicleResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+          nullable: true
+        externalId:
+          type: string
+          nullable: true
+        customerVehicleName:
+          type: string
+          nullable: true
+        registrationNumber:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          nullable: true
+        productionDate:
+          $ref: '#/components/schemas/ProductionDate'
+        possibleFuelTypes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        emissionLevel:
+          type: string
+          nullable: true
+        totalFuelTankVolume:
+          type: number
+          format: double
+          nullable: true
+        totalFuelTankCapacityGaseous:
+          type: number
+          format: double
+          nullable: true
+        totalBatteryPackCapacity:
+          type: number
+          format: double
+          nullable: true
+        moreDataAvailable:
+          type: boolean
+      additionalProperties: false
+    ProductionDate:
+      type: object
+      properties:
+        day:
+          type: integer
+          format: int32
+        month:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+      additionalProperties: false
+    UpdateTenantRequest:
+      type: object
+      properties:
+        volvoCredentials:
+          type: string
+          nullable: true
+        scaniaClientId:
+          type: string
+          nullable: true
+        scaniaSecretKey:
+          type: string
+          nullable: true
+        manToken:
+          type: string
+          nullable: true
+        daimlerToken:
+          type: string
+          nullable: true
+      additionalProperties: false
+    VehicleEvaluationResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+          description: Vin number of the vehicle. 17 characters long
+          nullable: true
+        totalEngineTime:
+          type: number
+          description: 'Volvo: in seconds'
+          format: double
+          nullable: true
+        engineRunningTime:
+          type: string
+          description: 'Scania: Expressed as HH:MM:SS'
+          nullable: true
+        avgSpeed:
+          type: number
+          description: Average driving speed in km/h
+          format: double
+          nullable: true
+        avgFuelConsumption:
+          type: number
+          description: "Volvo: ml/100km\r\nScania: l/100km"
+          format: double
+          nullable: true
+        avgElectricEnergyConsumption:
+          type: number
+          description: Wh/100km
+          format: double
+          nullable: true
+        totalFuelConsumption:
+          type: number
+          description: "Volvo: in ml\r\nScania: in l"
+          format: double
+          nullable: true
+        fuelConsumptionPerHour:
+          type: number
+          description: "Volvo: in ml/h\r\nScania: in l/h"
+          format: double
+          nullable: true
+        co2Emissions:
+          type: number
+          description: Co2 emissions in tons
+          format: double
+          nullable: true
+        co2Saved:
+          type: number
+          format: double
+          nullable: true
+        totalDistance:
+          type: number
+          format: double
+          nullable: true
+        totalGasUsed:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: http
+      description: Please enter token
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - Bearer: [ ]

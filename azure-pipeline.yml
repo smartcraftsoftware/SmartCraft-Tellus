@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+
+variables:
+  - group: common-deployment
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: SC Core Infrastructure/devops-pipeline-templates
+
+stages:
+  - template: templates/pipelines/pipeline-api-with-nugets-gitops.yaml@templates
+    parameters:
+      applicationName: tellus
+      repository: 'sc-core/tellus'
+      dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+      nugetfile: ''
+      testNugetfile: ''
+      buildContext: '$(Build.SourcesDirectory)'
+      team: 'sc-core'

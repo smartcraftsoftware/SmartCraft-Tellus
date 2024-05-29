@@ -45,16 +45,24 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     /// Creates a tenant
     /// </summary>
     /// <param name="tenantRequest"></param>
+    /// <param name="tenantId"></param>
     /// <returns>Ok result</returns>
     /// <response code="200">Tenant has been created</response>
     /// <response code="500">Internal server error</response>
     [HttpPost]
-    public async Task<ActionResult<Guid>> Post([FromBody]AddTenantRequest tenantRequest)
+    public async Task<ActionResult<Guid>> Post([FromHeader]Guid tenantId, [FromBody]AddTenantRequest tenantRequest)
     {
         try
         {
+            var tenant = await service.GetTenantAsync(tenantId);
+            if (tenant != null)
+            {
+                logger.LogWarning("Tenant already exists");
+                return BadRequest("Tenant already exists");
+            }
+
             logger.Log(LogLevel.Information, "Registering tenant");
-            return Ok(await service.RegisterTenantAsync(tenantRequest.ToDomainModel()));
+            return Ok(await service.RegisterTenantAsync(tenantId, tenantRequest.ToDomainModel()));
         }
         catch (Exception ex)
         {
@@ -77,8 +85,8 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
         try
         {
             logger.Log(LogLevel.Information, "Updating tenant {tenantId}", id);
-            var tenant = tenantRequest.ToDomainModel();
-            var updatedTenant = await service.UpdateTenantAsync(id, tenant);
+            var tenantToUpdate = tenantRequest.ToDomainModel();
+            var updatedTenant = await service.UpdateTenantAsync(id, tenantToUpdate);
             return Ok(updatedTenant);
         }
         catch (Exception ex)

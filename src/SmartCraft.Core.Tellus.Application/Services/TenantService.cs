@@ -22,10 +22,10 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
         return tenants.Select(x => x.ToDomainModel()).ToList();
     }
 
-    public async Task<Guid> RegisterTenantAsync(Tenant tenant)
+    public async Task<Guid> RegisterTenantAsync(Guid tenantId, Tenant tenant)
     {
-        var tenantToAdd = tenant.ToDataModel();
-        await repository.Add(tenantToAdd, tenantToAdd.Id);
+        var tenantToAdd = tenant.ToCreateTenantModel(tenantId);
+        await repository.Add(tenantToAdd, tenantId);
         return tenantToAdd.Id;
     }
 
@@ -44,7 +44,6 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
             existingTenant.ScaniaClientId = tenant.ScaniaClientId;
         if (tenant.ScaniaSecretKey != null)
             existingTenant.ScaniaSecretKey = tenant.ScaniaSecretKey;
-
         if (tenant.VolvoCredentials != null)
             existingTenant.VolvoCredentials = tenant.VolvoCredentials;
 

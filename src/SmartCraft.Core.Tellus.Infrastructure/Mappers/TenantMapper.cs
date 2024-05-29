@@ -27,4 +27,15 @@ public static class TenantMapper
             DaimlerToken = tenant.DaimlerToken
         };
     }
+
+    public static Infrastructure.Models.Tenant ToCreateTenantModel(this Domain.Models.Tenant tenant, Guid tenantId)
+    {
+        return new Infrastructure.Models.Tenant
+        {
+            Id = tenantId,
+            VolvoCredentials = tenant.VolvoCredentials,
+            ScaniaClientId = tenant.ScaniaClientId,
+            ScaniaSecretKey = tenant.ScaniaSecretKey,
+        };
+    }
 }

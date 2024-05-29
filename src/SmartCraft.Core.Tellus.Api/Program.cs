@@ -9,6 +9,7 @@ using SmartCraft.Core.Tellus.Infrastructure.Client;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using SmartCraft.Core.Tellus.Application.Client;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using SmartCraft.Core.Tellus.Domain.Validators;
 using Serilog;
 
@@ -17,9 +18,7 @@ var Configuration = builder.Configuration;
 
 //Create logger
 var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(new ConfigurationBuilder()
-    .AddJsonFile("seri-log.config.json")
-    .Build())
+    .ReadFrom.AppSettings()
     .Enrich.FromLogContext()
     .CreateLogger();
 builder.Logging.ClearProviders();
@@ -28,26 +27,50 @@ builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(logger, 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(swaggerGenOptions =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    swaggerGenOptions.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
     { 
         Title = "Tellus - A part of Smartcraft", 
         Version = "v1",
         Description = "Api to get ESG reports for vehicles."
     });
+    swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+    
+    
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    swaggerGenOptions.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
-builder.Services.AddApiVersioning(
-    o =>
-    {
-    o.AssumeDefaultVersionWhenUnspecified = true;
-        o.DefaultApiVersion = new ApiVersion(new DateOnly(2016, 7, 1));
-    });
+builder.Services.AddApiVersioning(apiVersioningOptions =>
+{
+    apiVersioningOptions.AssumeDefaultVersionWhenUnspecified = true;
+    apiVersioningOptions.DefaultApiVersion = new ApiVersion(new DateOnly(2016, 7, 1));
+});
 
 //DB
 builder.Services.AddDbContext<VehicleContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
@@ -86,7 +109,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(swaggerOptions =>
+    {
+        swaggerOptions.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+        {
+            swaggerDoc.Servers = new List<OpenApiServer> { new () { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{Configuration.GetValue(typeof(string),"BasePath")}" } };
+        });
+    });
     app.UseSwaggerUI();
 }
 

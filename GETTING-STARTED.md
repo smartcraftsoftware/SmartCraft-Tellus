@@ -15,21 +15,34 @@ You do this by making a POST request to the _/Tenants_ endpoint and entering the
 Your credentials can always be added/updated by making a PATCH request to the _/Tenants/{ID}_ endpoint
 
 ### Credentials specification
-
-**Volvo** </br>
-Credentials for Volvo can be created at https://developer.volvotrucks.com/
-- Volvo uses basic Authorization.
-- In Tellus, your volvo credentials should be formatted "{userName}:{password}"
-- The volvo credentials should be added to the "_volvoCredentials_"-field of your tenant
+To access a users data from, for example, their Scania trucks, you need to retrieve their Scania API client credentials.
+Below is a how-to for each manufacturer
 
 **Scania** </br>
-Credentials for Scania can be created at https://developer.scania.com/
-- Create an account as an FMS-developer.
-- Go to _my clients_ and create a new client.
-- Copy your Client-Id and SecretKey to the corresponding fields of your tenant.
+1. Ask the truck owner to contact their Scania dealer and ask for a My Scania account with a
+   "Developer" role added to it. The owner will need an appropriate Scania subscription with
+   access to fuel consumption data.
+2. Have the truck owner follow https://developer.scania.com/get-started-customer to get a
+  Client ID and a Secret Key.
+3. Collect this data when creating the tenant in the Tellus API.
 
-**MAN**
-TBD
+**Volvo** </br>
+1. Ask the truck owner to sign into their Volvo Connect account. They will need a
+subscription with the data package Transport Data.
+2. Press the Digital tools button in the top right (a square symbol with lots of squares). Go to
+Administration.
+3. Press API Manager and create an API Account.
+4. Fill in an optional user name and choose to share position, vehicle status and fuel &
+environmental data.
+5. Either choose included vehicles or choose Include All Current and Future Vehicles
+6. Copy the username and password. Collect this data when creating the tenant in the Tellus
+API.</br>
+_Please note that Tellus requires the credentials to be formatted "{userName}:{password}"_
+
+**MAN & Mercedes**
+
+Instructions will be available soon. Contact tellus@smartcraft.com if you need help finding the
+necessary credentials.
 
 ## Vehicles
 

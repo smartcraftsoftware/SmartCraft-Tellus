@@ -19,7 +19,7 @@ var Configuration = builder.Configuration;
 
 //Create logger
 var logger = new LoggerConfiguration()
-    .ReadFrom.AppSettings()
+    .ReadFrom.Configuration(Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
 builder.Logging.ClearProviders();
@@ -131,7 +131,7 @@ if (app.Environment.IsDevelopment())
     {
         swaggerOptions.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
         {
-            swaggerDoc.Servers = new List<OpenApiServer> { new () { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{Configuration.GetValue(typeof(string),"BasePath")}" } };
+            swaggerDoc.Servers = new List<OpenApiServer> { new () { Url = $"{httpReq.Scheme}://{Configuration.GetValue(typeof(string),"BasePath") ?? httpReq.Host.Value}" } };
         });
     });
     app.UseSwaggerUI();

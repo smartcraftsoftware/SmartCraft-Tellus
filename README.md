@@ -11,18 +11,8 @@
 - **Free Service:** SmartCraft provides a hosted service for Tellus that is free to use. The hosted service also provides a unified REST API as a consistent interface to access vehicle data from the different manufacturers.
 
 ## Getting Started
+[How-To guide](https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md)
 
-### Prerequisites
-
-- .NET runtime environment
-
-### Installation
-
-1. Clone the repository.
-  
-2. Build the solution.
-
-3. That's it.
 
 ### API Documentation
 

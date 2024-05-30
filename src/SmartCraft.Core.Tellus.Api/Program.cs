@@ -12,9 +12,12 @@ using System.Reflection;
 using Microsoft.OpenApi.Models;
 using SmartCraft.Core.Tellus.Domain.Validators;
 using Serilog;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+builder.AddNpgsqlDbContext<VehicleContext>("postgresdbvehicles");
+builder.AddNpgsqlDbContext<TenantContext>("postgresdbtenants");
 var Configuration = builder.Configuration;
 
 //Create logger
@@ -110,19 +113,21 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 
 // Migrate latest database changes during startup
-using (var scope = app.Services.CreateScope())
-{
-    var vehicleContext = scope.ServiceProvider
-        .GetRequiredService<VehicleContext>();
-    var tenantContext = scope.ServiceProvider
-        .GetRequiredService<TenantContext>();
-
-    // Here is the migration executed
-    vehicleContext.Database.Migrate();
-    tenantContext.Database.Migrate();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var vehicleContext = scope.ServiceProvider
+//        .GetRequiredService<VehicleContext>();
+//    var tenantContext = scope.ServiceProvider
+//        .GetRequiredService<TenantContext>();
+//
+//    // Here is the migration executed
+//    vehicleContext.Database.Migrate();
+//    tenantContext.Database.Migrate();
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

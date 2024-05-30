@@ -19,6 +19,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.5">
@@ -37,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmartCraft.Core.Tellus.Application\SmartCraft.Core.Tellus.Application.csproj" />
+    <ProjectReference Include="..\SmartCraft.Core.Tellus.Aspire\SmartCraft.Core.Tellus.Aspire.ServiceDefaults\SmartCraft.Core.Tellus.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\SmartCraft.Core.Tellus.Domain\SmartCraft.Core.Tellus.Domain.csproj" />
     <ProjectReference Include="..\SmartCraft.Core.Tellus.Infrastructure\SmartCraft.Core.Tellus.Infrastructure.csproj" />
   </ItemGroup>

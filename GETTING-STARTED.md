@@ -1,4 +1,8 @@
 # Getting Started
+## Onboarding
+For now, you need to contact us at
+tellus@smartcraft.com
+to be registered as a user of the API if you wish to access the SmartCraft hosted Tellus service
 
 ## Tenant
 

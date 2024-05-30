@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: SmartCraft Tellus API
-  description: 'API to access real-world data from trucks. More info: https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md'
+  description: 'API to access real-world data from trucks. More info: [here](https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md)'
   version: v1
 paths:
   '/api/v{version}/Tenants/{id}':

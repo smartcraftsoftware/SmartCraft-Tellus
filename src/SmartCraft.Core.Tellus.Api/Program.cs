@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(swaggerGenOptions =>
     { 
         Title = "SmartCraft Tellus API", 
         Version = "v1",
-        Description = "API to access real-world data from trucks. More info: https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md"
+        Description = "API to access real-world data from trucks. More info: [here](https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md)"
     });
     swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

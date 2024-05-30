@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Tellus - A part of Smartcraft
-  description: Api to get ESG reports for vehicles.
+  title: SmartCraft Tellus API
+  description: 'API to access real-world data from trucks. More info: https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md'
   version: v1
 paths:
   '/api/v{version}/Tenants/{id}':

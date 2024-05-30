@@ -17,6 +17,12 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 var Configuration = builder.Configuration;
 
+Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+
 //Create logger
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(Configuration)
@@ -110,8 +116,6 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 
 var app = builder.Build();
 
-
-// Migrate latest database changes during startup
 using (var scope = app.Services.CreateScope())
 {
     var vehicleContext = scope.ServiceProvider
@@ -119,7 +123,6 @@ using (var scope = app.Services.CreateScope())
     var tenantContext = scope.ServiceProvider
         .GetRequiredService<TenantContext>();
 
-    // Here is the migration executed
     vehicleContext.Database.Migrate();
     tenantContext.Database.Migrate();
 }

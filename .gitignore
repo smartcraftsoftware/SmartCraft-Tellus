@@ -3,6 +3,9 @@
 
 appsettings.Development.json
 
+# local settings
+**/*.local.json
+ 
 
 # User-specific files
 *.suo

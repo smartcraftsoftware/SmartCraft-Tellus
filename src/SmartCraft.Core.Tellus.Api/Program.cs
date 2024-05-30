@@ -33,9 +33,9 @@ builder.Services.AddSwaggerGen(swaggerGenOptions =>
 {
     swaggerGenOptions.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
     { 
-        Title = "Tellus - A part of Smartcraft", 
+        Title = "SmartCraft Tellus API", 
         Version = "v1",
-        Description = "Api to get ESG reports for vehicles."
+        Description = "API to access real-world data from trucks. More info: https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md"
     });
     swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

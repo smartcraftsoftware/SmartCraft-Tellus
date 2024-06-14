@@ -18,8 +18,8 @@ public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> wher
     {
         try 
         {
-            entity.CreatedAt = DateTime.Now;
-            entity.LastUpdated = DateTime.Now;
+            entity.CreatedAt = DateTime.UtcNow;
+            entity.LastUpdated = DateTime.UtcNow;
             entity.CreatedBy = tenantId;
             entity.LastUpdatedBy = tenantId;
             _entities.Add(entity);

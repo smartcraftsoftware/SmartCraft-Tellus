@@ -127,6 +127,7 @@ using (var scope = app.Services.CreateScope())
     tenantContext.Database.Migrate();
 }
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

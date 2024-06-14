@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Vehicle
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

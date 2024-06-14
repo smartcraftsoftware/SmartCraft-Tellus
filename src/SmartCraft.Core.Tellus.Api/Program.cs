@@ -82,7 +82,7 @@ builder.Services.AddApiVersioning(apiVersioningOptions =>
 
 //DB
 builder.Services.AddDbContext<VehicleContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
-builder.Services.AddDbContext<TenantContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
+builder.Services.AddDbContext<TenantContext>(options => options.UseNpgsql(Configuration.GetConnectionString("TenantConnectionString")));
 
 
 
@@ -116,16 +116,16 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var vehicleContext = scope.ServiceProvider
-//        .GetRequiredService<VehicleContext>();
-//    var tenantContext = scope.ServiceProvider
-//        .GetRequiredService<TenantContext>();
-//
-//    vehicleContext.Database.Migrate();
-//    tenantContext.Database.Migrate();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var vehicleContext = scope.ServiceProvider
+        .GetRequiredService<VehicleContext>();
+    var tenantContext = scope.ServiceProvider
+        .GetRequiredService<TenantContext>();
+
+    vehicleContext.Database.Migrate();
+    tenantContext.Database.Migrate();
+}
 
 
 // Configure the HTTP request pipeline.

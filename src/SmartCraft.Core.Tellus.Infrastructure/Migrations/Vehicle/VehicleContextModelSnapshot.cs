@@ -3,21 +3,18 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Vehicle
 {
     [DbContext(typeof(VehicleContext))]
-    [Migration("20240614062112_initial")]
-    partial class initial
+    partial class VehicleContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

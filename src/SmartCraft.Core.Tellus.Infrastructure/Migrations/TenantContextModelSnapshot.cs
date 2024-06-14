@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
 
 #nullable disable
 
-namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Tenant
+namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 {
     [DbContext(typeof(TenantContext))]
-    [Migration("20240614063046_initial")]
-    partial class initial
+    partial class TenantContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

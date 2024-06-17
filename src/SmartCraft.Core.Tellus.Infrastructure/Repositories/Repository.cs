@@ -45,7 +45,7 @@ public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> wher
 
     public async Task<TEntity> Update(TEntity entity, Guid tenantId)
     {
-        entity.LastUpdated = DateTime.Now;
+        entity.LastUpdated = DateTime.UtcNow;
         entity.LastUpdatedBy = tenantId;
         _context.Update(entity);
         await _context.SaveChangesAsync();

@@ -15,21 +15,21 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     /// <summary>
     /// Gets a tenant
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="tenantId"></param>
     /// <returns>A tenant object</returns>
     /// <response code="200">Returns a tenant</response>
     /// <response code="404">Could not find specified tenant</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<GetTenantResponse>> Get(Guid id)
+    [HttpGet]
+    public async Task<ActionResult<GetTenantResponse>> Get([FromHeader]Guid tenantId)
     {
         try
         {
-            logger.Log(LogLevel.Information, "Getting tenant {tenantId}", id);
-            var tenant = await service.GetTenantAsync(id);
+            logger.Log(LogLevel.Information, "Getting tenant {tenantId}", tenantId);
+            var tenant = await service.GetTenantAsync(tenantId);
             if(tenant == null)
             {
-                logger.LogWarning("Could not find tenant {tenantId}", id);
+                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant.");
             }
 
@@ -37,7 +37,7 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting tenant {tenantId}", id);
+            logger.Log(LogLevel.Error, ex, "Error getting tenant {tenantId}", tenantId);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -74,24 +74,24 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     /// <summary>
     /// Updates an existing tenant
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="tenantId"></param>
     /// <param name="tenantRequest"></param>
     /// <returns>Ok result</returns>
     /// <response code="200">Tenant has been updated</response>
     /// <response code="500">Internal server error</response>
-    [HttpPatch("{id}")]
-    public async Task<ActionResult> Patch(Guid id, [FromBody]UpdateTenantRequest tenantRequest)
+    [HttpPatch]
+    public async Task<ActionResult> Patch([FromHeader]Guid tenantId, [FromBody]UpdateTenantRequest tenantRequest)
     {
         try
         {
-            logger.Log(LogLevel.Information, "Updating tenant {tenantId}", id);
+            logger.Log(LogLevel.Information, "Updating tenant {tenantId}", tenantId);
             var tenantToUpdate = tenantRequest.ToDomainModel();
-            var updatedTenant = await service.UpdateTenantAsync(id, tenantToUpdate);
+            var updatedTenant = await service.UpdateTenantAsync(tenantId, tenantToUpdate);
             return Ok(updatedTenant);
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error updating tenant {tenantId}", id);
+            logger.Log(LogLevel.Error, ex, "Error updating tenant {tenantId}", tenantId);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -99,29 +99,29 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     /// <summary>
     /// Deletes a tenant
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="tenantId"></param>
     /// <returns>No content result</returns>
     /// <response code="204">Tenant has been deleted</response>
     /// <response code="404">Could not find specified tenant</response>
     /// <response code="500">Internal server error</response>
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromHeader]Guid tenantId)
     {
         try
         {
-            logger.Log(LogLevel.Information, "Deleting tenant {tenantId}", id);
-            if(await service.DeleteTenant(id))
+            logger.Log(LogLevel.Information, "Deleting tenant {tenantId}", tenantId);
+            if(await service.DeleteTenant(tenantId))
             {
-                logger.Log(LogLevel.Information, "Tenant {tenantId} has been deleted", id);
+                logger.Log(LogLevel.Information, "Tenant {tenantId} has been deleted", tenantId);
                 return NoContent();
             }
 
-            logger.LogWarning("Could not find tenant {tenantId}", id);
+            logger.LogWarning("Could not find tenant {tenantId}", tenantId);
             return NotFound();
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error deleting tenant {tenantId}", id);
+            logger.Log(LogLevel.Error, ex, "Error deleting tenant {tenantId}", tenantId);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }

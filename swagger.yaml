@@ -4,16 +4,15 @@ info:
   description: 'API to access real-world data from trucks. More info: [here](https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md)'
   version: v1
 paths:
-  '/api/v{version}/Tenants/{id}':
+  '/api/v{version}/Tenants':
     get:
       tags:
         - Tenants
       summary: Gets a tenant
       parameters:
-        - name: id
-          in: path
+        - name: tenantId
+          in: header
           description: ''
-          required: true
           schema:
             type: string
             format: uuid
@@ -39,67 +38,6 @@ paths:
           description: Could not find specified tenant
         '500':
           description: Internal server error
-    patch:
-      tags:
-        - Tenants
-      summary: Updates an existing tenant
-      parameters:
-        - name: id
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: version
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
-      responses:
-        '200':
-          description: Tenant has been updated
-        '500':
-          description: Internal server error
-    delete:
-      tags:
-        - Tenants
-      summary: Deletes a tenant
-      parameters:
-        - name: id
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: version
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '204':
-          description: Tenant has been deleted
-        '404':
-          description: Could not find specified tenant
-        '500':
-          description: Internal server error
-  '/api/v{version}/Tenants':
     post:
       tags:
         - Tenants
@@ -144,6 +82,64 @@ paths:
               schema:
                 type: string
                 format: uuid
+        '500':
+          description: Internal server error
+    patch:
+      tags:
+        - Tenants
+      summary: Updates an existing tenant
+      parameters:
+        - name: tenantId
+          in: header
+          description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Tenant has been updated
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Tenants
+      summary: Deletes a tenant
+      parameters:
+        - name: tenantId
+          in: header
+          description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Tenant has been deleted
+        '404':
+          description: Could not find specified tenant
         '500':
           description: Internal server error
   '/api/v{version}/Vehicles/{vehicleBrand}/vehicles':

@@ -36,6 +36,7 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
         {
             throw new NullReferenceException("Tenant not found");
         }
+
         if (tenant.DaimlerToken != null)
             existingTenant.DaimlerToken = tenant.DaimlerToken;
         if (tenant.ManToken != null)

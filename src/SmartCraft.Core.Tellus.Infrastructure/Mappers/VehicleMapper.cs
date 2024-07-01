@@ -182,6 +182,23 @@ public static class VehicleMapper
         };
     }
 
+    public static Infrastructure.Models.IntervalStatusReport ToDataModel(this IntervalStatusReport intervalStatusReport)
+    {
+        return new Infrastructure.Models.IntervalStatusReport
+        {
+            Id = intervalStatusReport.Id,
+            StartDateTime = intervalStatusReport.StartDateTime,
+            EndDateTime = intervalStatusReport.EndDateTime,
+            EngineTotalFuelUsed = intervalStatusReport.EngineTotalFuelUsed,
+            HrTotalVehicleDistance = intervalStatusReport.HrTotalVehicleDistance,
+            TotalElectricEnergyUsed = intervalStatusReport.TotalElectricEnergyUsed,
+            TotalElectricMotorHours = intervalStatusReport.TotalElectricMotorHours,
+            TotalEngineHours = intervalStatusReport.TotalEngineHours,
+            TotalGaseousFuelUsed = intervalStatusReport.TotalGaseousFuelUsed,
+            Vin = intervalStatusReport.Vin,
+        };
+    }
+
     private static Domain.Models.AccumulatedData ToDomainModel(this ApiResponse.AccumulatedData accumulatedData)
     {
         return new Domain.Models.AccumulatedData

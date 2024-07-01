@@ -11,6 +11,11 @@ public class DaimlerClient : IVehicleClient
         throw new NotImplementedException();
     }
 
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
     {
         throw new NotImplementedException();

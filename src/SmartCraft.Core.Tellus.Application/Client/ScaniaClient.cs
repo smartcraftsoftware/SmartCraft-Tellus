@@ -151,6 +151,11 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
     {
         return Base64Url.Encode(challengeResponse);
     }
+
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class Base64Url

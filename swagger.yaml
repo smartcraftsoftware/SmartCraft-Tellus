@@ -229,6 +229,47 @@ paths:
           description: Could not find vehicle
         '500':
           description: Internal server error
+  '/api/v{version}/Vehicles/{vehicleBrand}/statusreport':
+    get:
+      tags:
+        - Vehicles
+      parameters:
+        - name: vehicleBrand
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: vinOrId
+          in: query
+          schema:
+            type: string
+        - name: startTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: stopTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: tenantId
+          in: header
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalStatusReportResponse'
 components:
   schemas:
     AddTenantRequest:
@@ -329,6 +370,45 @@ components:
           nullable: true
         moreDataAvailable:
           type: boolean
+      additionalProperties: false
+    IntervalStatusReportResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+          nullable: true
+        startDateTime:
+          type: string
+          format: date-time
+          nullable: true
+        endDateTime:
+          type: string
+          format: date-time
+          nullable: true
+        hrTotalVehicleDistance:
+          type: number
+          format: double
+          nullable: true
+        totalEngineHours:
+          type: number
+          format: double
+          nullable: true
+        totalElectricMotorHours:
+          type: number
+          format: double
+          nullable: true
+        engineTotalFuelUsed:
+          type: number
+          format: double
+          nullable: true
+        totalGaseousFuelUsed:
+          type: number
+          format: double
+          nullable: true
+        totalElectricEnergyUsed:
+          type: number
+          format: double
+          nullable: true
       additionalProperties: false
     ProductionDate:
       type: object

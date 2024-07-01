@@ -85,7 +85,6 @@ builder.Services.AddDbContext<VehicleContext>(options => options.UseNpgsql(Confi
 builder.Services.AddDbContext<TenantContext>(options => options.UseNpgsql(Configuration.GetConnectionString("TenantConnectionString")));
 
 
-
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<HttpClient>();
 
@@ -111,6 +110,7 @@ builder.Services.AddScoped<VehicleContext>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>>();
+builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Tenant, TenantContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Tenant, TenantContext>>();
 
 

@@ -52,6 +52,56 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations.Vehicle
                     b.ToTable("EsgVehicleReports");
                 });
 
+            modelBuilder.Entity("SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("EndDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("EngineTotalFuelUsed")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("HrTotalVehicleDistance")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastUpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("StartDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("TotalElectricEnergyUsed")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("TotalElectricMotorHours")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("TotalEngineHours")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("TotalGaseousFuelUsed")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Vin")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IntervalReports");
+                });
+
             modelBuilder.Entity("SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport", b =>
                 {
                     b.Property<Guid>("Id")

@@ -25,4 +25,18 @@ public static class ClientHelpers
 
         return uriBuilder;
     }
+
+    public static UriBuilder BuildUri(string baseUrl, string path, Dictionary<string, string> parameters)
+    {
+        UriBuilder uriBuilder = new UriBuilder(baseUrl);
+        uriBuilder.Path = path;
+        StringBuilder query = new StringBuilder();
+        foreach (var parameter in parameters)
+        {
+            query.Append($"{parameter.Key}={parameter.Value}&");
+        }
+        uriBuilder.Query = query.ToString().TrimEnd('&');
+
+        return uriBuilder;
+    }
 }

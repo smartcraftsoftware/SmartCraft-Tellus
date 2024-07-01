@@ -11,10 +11,12 @@ public class VehiclesService : IVehiclesService
 {
     private Dictionary<string, IVehicleClient> clientDictionary = new Dictionary<string, IVehicleClient>();
     private readonly IRepository<Infrastructure.Models.Vehicle, VehicleContext> _repository;
+    private readonly IRepository<Infrastructure.Models.IntervalStatusReport, VehicleContext> _intervalStatusRepository;
     private readonly IEnumerable<IVehicleClient> _clients;
-    public VehiclesService(IRepository<Infrastructure.Models.Vehicle, VehicleContext> repository, IEnumerable<IVehicleClient> clients) 
+    public VehiclesService(IRepository<Infrastructure.Models.Vehicle, VehicleContext> repository, IRepository<Infrastructure.Models.IntervalStatusReport, VehicleContext> intervalStatusRepository, IEnumerable<IVehicleClient> clients) 
     {
         _repository = repository;
+        _intervalStatusRepository = intervalStatusRepository;
         _clients = clients;
         Execute();
     }
@@ -63,6 +65,24 @@ public class VehiclesService : IVehiclesService
     private bool MatchKeyvalue(string vehicleBrand)
     {
         return clientDictionary.ContainsKey(vehicleBrand);
+    }
+
+    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    {
+        if(stopTime == default)
+            stopTime = DateTime.Now;
+
+        if(!MatchDateTimeValue(startTime, stopTime))
+            throw new ArgumentException("Invalid date time values");
+
+        if (!MatchKeyvalue(vehicleBrand))
+            throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
+
+        var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetIntervalStatusReportAsync(vin, tenant, startTime, stopTime);
+
+        await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
+
+        return vehicleIntervalStatus;
     }
 };
 

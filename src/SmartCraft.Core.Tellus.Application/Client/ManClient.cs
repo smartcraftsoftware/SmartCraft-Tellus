@@ -36,6 +36,11 @@ public class ManClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
     {
         UriBuilder uriBuilder = ClientHelpers.BuildUri("api.assets.rio.cloud", $"assets", $"identification_type=vin&status=active");

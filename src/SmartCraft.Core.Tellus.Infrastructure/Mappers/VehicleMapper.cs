@@ -131,6 +131,57 @@ public static class VehicleMapper
         };
     }
 
+    public static IntervalStatusReport ToIntervalDomainModel(this VolvoVehicleStatusResponse statusResponse)
+    {
+        // sort statusResponse VehicleStatus by received date, just in case
+        var vehicleStatuses = statusResponse?.VehicleStatus?.OrderBy(x => x.CreatedDateTime).ToArray();
+
+        var vin = vehicleStatuses?[0].Vin ?? string.Empty;
+
+        var first = vehicleStatuses?[0];
+        var last = vehicleStatuses?[^1];
+
+        var firstDate = first?.CreatedDateTime;
+        var lastDate = last?.CreatedDateTime;
+
+        var firstTotalFuelUsed = first?.EngineTotalFuelUsed;
+        var lastTotalFuelUsed = last?.EngineTotalFuelUsed;
+        var totalFuelUsed = lastTotalFuelUsed - firstTotalFuelUsed;
+
+        var firstHrTotalVehicleDistance = first?.HrTotalVehicleDistance;
+        var lastHrTotalVehicleDistance = last?.HrTotalVehicleDistance;
+        var totalHrTotalVehicleDistance = lastHrTotalVehicleDistance - firstHrTotalVehicleDistance;
+
+        var firstTotalEngineHours = first?.TotalEngineHours;
+        var lastTotalEngineHours = last?.TotalEngineHours;
+        var totalEngineHours = lastTotalEngineHours - firstTotalEngineHours;
+
+        var firstTotalElectricMotorHours = first?.TotalElectricMotorHours;
+        var lastTotalElectricMotorHours = last?.TotalElectricMotorHours;
+        var totalElectricMotorHours = lastTotalElectricMotorHours - firstTotalElectricMotorHours;
+
+        var firstTotalGaseousFuelUsed = first?.TotalGaseousFuelUsed;
+        var lastTotalGaseousFuelUsed = last?.TotalGaseousFuelUsed;
+        var totalGaseousFuelUsed = lastTotalGaseousFuelUsed - firstTotalGaseousFuelUsed;
+
+        var firstTotalElectricEnergyUsed = first?.TotalElectricEnergyUsed;
+        var lastTotalElectricEnergyUsed = last?.TotalElectricEnergyUsed;
+        var totalElectricEnergyUsed = lastTotalElectricEnergyUsed - firstTotalElectricEnergyUsed;
+
+        return new IntervalStatusReport
+        {
+            Vin = vin,
+            StartDateTime = firstDate,
+            EndDateTime = lastDate,
+            EngineTotalFuelUsed = totalFuelUsed,
+            HrTotalVehicleDistance = totalHrTotalVehicleDistance,
+            TotalEngineHours = totalEngineHours,
+            TotalElectricMotorHours = totalElectricMotorHours,
+            TotalGaseousFuelUsed = totalGaseousFuelUsed,
+            TotalElectricEnergyUsed = totalElectricEnergyUsed
+        };
+    }
+
     private static Domain.Models.AccumulatedData ToDomainModel(this ApiResponse.AccumulatedData accumulatedData)
     {
         return new Domain.Models.AccumulatedData

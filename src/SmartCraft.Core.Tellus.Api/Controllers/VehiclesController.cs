@@ -95,4 +95,48 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
+    /// <summary>
+    /// Gets a summarized environmental status report for a vehicle
+    /// </summary>
+    /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
+    /// <param name="vinOrId">Vin number or external id of vehicle.
+    /// <param name="startTime">Start time of interval</param>
+    /// <param name="stopTime">Stop time of interval</param>
+    /// <returns></returns>
+    /// <response code="200">Returns a vehicle status report</response>
+    /// <response code="404">Could not find vehicle</response>
+    /// <response code="500">Internal server error</response>
+    [HttpGet("{vehicleBrand}/statusreport")]
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    {
+        try
+        {
+            logger.Log(LogLevel.Information, "Fetching vehicle statuses for tenant {tenantId}", tenantId);
+            if (vinOrId != null)
+            {
+                logger.Log(LogLevel.Information, "...more specifically for {vehicleBrand} vehicle {vehicleId}", vehicleBrand, vinOrId);
+            }
+
+            var tenant = await tenantService.GetTenantAsync(tenantId);
+            if (tenant == null)
+            {
+                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
+                return NotFound("Could not find tenant");
+            }
+
+            var statusReport = await vehicleService.GetIntervalVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            return Ok(statusReport.ToIntervalRespone());
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.Log(LogLevel.Error, $"The vehicle client threw an HTTP request exception: \"{(int)ex.StatusCode} {ex.Message}\"");
+            return StatusCode((int)ex.StatusCode, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.Log(LogLevel.Error, ex, "Error getting vehicle status report for tenant {tenantId}", tenantId);
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
 }

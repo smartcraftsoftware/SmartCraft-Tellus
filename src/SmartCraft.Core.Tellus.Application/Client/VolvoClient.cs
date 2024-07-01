@@ -110,6 +110,67 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
+    public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime) {
+        TimeSpan ts = DateTime.Now - startTime;
+        if (ts.TotalDays >= 14)
+            throw new HttpRequestException("Volvo: only the last 14 days are available!", null, HttpStatusCode.BadRequest);
+
+        var param = new Dictionary<string, string>
+        {
+            { "vin", vin },
+            { "starttime", startTime.ToIso8601() },
+            { "stoptime", stopTime.ToIso8601() },
+            { "triggerFilter", "TIMER" },
+            { "contentFilter", "SNAPSHOT" },
+            { "datetype", "received" }
+        };
+
+        var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", param);
+        var credentials = tenant?.VolvoCredentials ?? "";
+        if (string.IsNullOrEmpty(credentials))
+            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+
+        Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
+        {
+            { "Accept", "application/vnd.fmsstandard.com.Vehiclestatuses.v2.1+json" },
+            { "Authorization", "Basic " + CredentialsAsB64String(credentials) }
+        };
+
+        var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+
+        #pragma warning disable CS8603 // Possible null reference return.
+        var response = await client.SendAsync(request);
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            throw new HttpRequestException("Volvo: could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+        #pragma warning restore CS8603 // Possible null reference return.
+
+        response.EnsureSuccessStatusCode();
+        string responseContent = await response.Content.ReadAsStringAsync();
+        var vehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+        if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse.VehicleStatus.Length > 0)
+        {
+            bool moreDataAvailable = true;
+            while (moreDataAvailable)
+            {
+                var latest = vehicleStatusResponse.VehicleStatus[^1];
+                #pragma warning disable CS8629 // Nullable value type may be null.
+                DateTime latestDate = (DateTime)latest.ReceivedDateTime;
+                #pragma warning restore CS8629 // Nullable value type may be null.
+                latestDate = latestDate.AddSeconds(1);
+                param["starttime"] = latestDate.ToIso8601();
+                uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", param);
+                request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+                response = await client.SendAsync(request);
+                responseContent = await response.Content.ReadAsStringAsync();
+                var newVehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+                vehicleStatusResponse.VehicleStatus = vehicleStatusResponse.VehicleStatus.Concat(newVehicleStatusResponse.VehicleStatus).ToArray();
+                moreDataAvailable = newVehicleStatusResponse.MoreDataAvailable;
+            }
+        }
+
+        return vehicleStatusResponse.ToIntervalDomainModel();
+    }
+
     private string CredentialsAsB64String(string credentials)
     {
         var bytes = System.Text.Encoding.UTF8.GetBytes(credentials);

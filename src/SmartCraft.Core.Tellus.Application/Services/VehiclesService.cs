@@ -64,5 +64,19 @@ public class VehiclesService : IVehiclesService
     {
         return clientDictionary.ContainsKey(vehicleBrand);
     }
+
+    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    {
+        if(stopTime == default)
+            stopTime = DateTime.Now;
+
+        if(!MatchDateTimeValue(startTime, stopTime))
+            throw new ArgumentException("Invalid date time values");
+
+        if (!MatchKeyvalue(vehicleBrand))
+            throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
+
+        return await clientDictionary[vehicleBrand.ToLower()].GetIntervalStatusReportAsync(vin, tenant, startTime, stopTime);
+    }
 };
 

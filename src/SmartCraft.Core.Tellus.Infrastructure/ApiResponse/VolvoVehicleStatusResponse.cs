@@ -1,6 +1,7 @@
 ﻿namespace SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
 public class VolvoVehicleStatusResponse
 {
+    public bool MoreDataAvailable { get; set; }
     public VolvoVehicleStatus[]? VehicleStatus { get; set; }
 }
 

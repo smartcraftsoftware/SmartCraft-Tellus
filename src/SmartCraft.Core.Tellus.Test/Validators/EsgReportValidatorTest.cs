@@ -16,8 +16,8 @@ public class EsgReportValidatorTest
             new EsgVehicleReport
             {
                 Id = Guid.NewGuid(),
-                StartTime = DateTime.Now.AddDays(-3),
-                StopTime = DateTime.Now.Date,
+                StartTime = DateTime.UtcNow.AddDays(-3),
+                StopTime = DateTime.UtcNow.Date,
                 VehicleEvaluations = new List<VehicleEvaluation>
                 {
                     new VehicleEvaluation
@@ -53,8 +53,8 @@ public class EsgReportValidatorTest
             new EsgVehicleReport
             {
                 Id = Guid.NewGuid(),
-                StartTime = DateTime.Now.AddMonths(-3),
-                StopTime = DateTime.Now.Date,
+                StartTime = DateTime.UtcNow.AddMonths(-3),
+                StopTime = DateTime.UtcNow.Date,
                 VehicleEvaluations = new List<VehicleEvaluation>()
             }
         },
@@ -87,8 +87,8 @@ public class EsgReportValidatorTest
         var report = new EsgVehicleReport
         {
             Id = Guid.NewGuid(),
-            StartTime = DateTime.Now.AddDays(-3),
-            StopTime = DateTime.Now.Date,
+            StartTime = DateTime.UtcNow.AddDays(-3),
+            StopTime = DateTime.UtcNow.Date,
             VehicleEvaluations = new List<VehicleEvaluation>
             {
                 new VehicleEvaluation

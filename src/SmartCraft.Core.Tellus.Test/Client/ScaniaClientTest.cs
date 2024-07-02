@@ -64,7 +64,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         // Act
-        var result = await client.GetEsgReportAsync("vin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var result = await client.GetEsgReportAsync("vin", tenant, DateTime.UtcNow.AddDays(-1).ToString(), DateTime.UtcNow.ToString());
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<EsgVehicleReport>();
@@ -124,7 +124,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        Func<Task> action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.Now.AddDays(-1), DateTime.Now);
+        Func<Task> action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1).ToString(), DateTime.UtcNow.ToString());
         
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
@@ -320,7 +320,7 @@ public class ScaniaClientTest
                         new VehicleStatus
                         {
                             Vin = "thisisavin",
-                            CreatedDateTime = "DateTime.Now",
+                            CreatedDateTime = "DateTime.UtcNow",
                             
                         }
                     ]
@@ -331,7 +331,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var result = await client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.Now.AddDays(-1), DateTime.Now);
+        var result = await client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1).ToString(), DateTime.UtcNow.ToString());
 
         //Assert
         result.Should().NotBeNull().
@@ -407,7 +407,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.Now.AddDays(-1), DateTime.Now);
+        var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1).ToString(), DateTime.UtcNow.ToString());
 
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
@@ -479,7 +479,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.Now.AddDays(-1), DateTime.Now);
+        var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1).ToString(), DateTime.UtcNow.ToString());
         
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();

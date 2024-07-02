@@ -200,13 +200,11 @@ paths:
           description: Start time of interval
           schema:
             type: string
-            format: date-time
         - name: stopTime
           in: query
           description: Stop time of interval
           schema:
             type: string
-            format: date-time
         - name: tenantId
           in: header
           description: Id of tenant
@@ -247,12 +245,10 @@ paths:
           in: query
           schema:
             type: string
-            format: date-time
         - name: stopTime
           in: query
           schema:
             type: string
-            format: date-time
         - name: tenantId
           in: header
           schema:

@@ -66,7 +66,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/esgreport")]
-    public async Task<ActionResult<EsgReportResponse>> GetEsgReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    public async Task<ActionResult<EsgReportResponse>> GetEsgReportAsync(string vehicleBrand, string? vinOrId, string startTime, string stopTime, [FromHeader] Guid tenantId)
     {
         try
         {
@@ -77,7 +77,6 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
                 logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
             }
-
 
             var vehicle = await esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
             if (vehicle == null)
@@ -108,7 +107,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/statusreport")]
-    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, string startTime, string stopTime, [FromHeader] Guid tenantId)
     {
         try
         {

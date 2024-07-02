@@ -13,13 +13,13 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
     public string VehicleBrand => "scania";
     string? token;
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, string startTime, string stopTime)
     {
         token ??= await AuthScania(tenant);
 
         var uriBuilder = string.IsNullOrEmpty(vin) ?
-            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime:yyyy-MM-dd}&endDate={stopTime:yyyy-MM-dd}") :
-            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime:yyyy-MM-dd}&endDate={stopTime:yyyy-MM-dd}&vinOfInterest={vin}");
+            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime}&endDate={stopTime}") :
+            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime}&endDate={stopTime}&vinOfInterest={vin}");
 
         if (token == null)
             throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
@@ -47,6 +47,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         return esgResponse.ToDomainModel(startTime, stopTime);
     }
+
     public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehicles", "");
@@ -78,14 +79,22 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return vehicleApiResponse?.VehicleResponse?.Vehicles?.Select(x => x.ToDomainModel()).ToList() ?? new List<Vehicle>();
     }
 
-    public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
+    public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, string startTime, string? stopTime)
     {
         token ??= await AuthScania(tenant); 
 
         if (token == null)
             throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
-
-        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", $"vin={vin}&latestonly=true");
+        var param = new Dictionary<string, string>
+        {
+            { "vin", vin },
+            { "starttime", startTime },
+            { "stoptime", stopTime ?? DateTime.UtcNow.ToString() },
+            { "triggerFilter", "TIMER" },
+            { "contentFilter", "SNAPSHOT" },
+            { "datetype", "received" }
+        };
+        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {
@@ -152,7 +161,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return Base64Url.Encode(challengeResponse);
     }
 
-    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, string startTime, string stopTime)
     {
         throw new NotImplementedException();
     }

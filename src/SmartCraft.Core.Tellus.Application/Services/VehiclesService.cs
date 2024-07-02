@@ -25,18 +25,14 @@ public class VehiclesService : IVehiclesService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime = default)
+    public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, string startTime, string stopTime)
     {
-        if(stopTime == default)
-            stopTime = DateTime.Now;
-
-        if(!MatchDateTimeValue(startTime, stopTime))
-            throw new ArgumentException("Invalid date time values");
+        (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
         if (!MatchKeyvalue(vehicleBrand))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
-        return await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vinNumber, tenant, startTime, stopTime);
+        return await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vinNumber, tenant, start, stop);
     }
 
     public async Task<List<Vehicle>> GetFleetAsync(string vehicleBrand, Tenant tenant)
@@ -48,41 +44,71 @@ public class VehiclesService : IVehiclesService
         return vehicles;
     }
 
-    private bool MatchDateTimeValue(DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, string startTime, string stopTime)
     {
-        if (startTime > stopTime)
-            return false;
-        if (startTime > DateTime.Now)
-            return false;
-        if (stopTime > DateTime.Now)
-            return false;
-        if (startTime < DateTime.Now.AddMonths(-3))
-            return false;
+        (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
-        return true;
+        if (!MatchKeyvalue(vehicleBrand))
+            throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
+
+        var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetIntervalStatusReportAsync(vin, tenant, start, stop);
+
+        await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
+
+        return vehicleIntervalStatus;
+    }
+
+    private (string, string) ParseAndMatchDateTimeValues(string startTime, string stopTime)
+    {
+        if (!DateTime.TryParse(startTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out var start))
+        {
+            throw new InvalidOperationException("Invalid start time format");
+        }
+
+        if (!DateTime.TryParse(stopTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out var stop))
+        {
+            throw new InvalidOperationException("Invalid stop time format");
+        }
+
+        start = start.ToUniversalTime();
+        stop = stop.ToUniversalTime();
+
+        if (start.Kind != DateTimeKind.Utc && start.Kind != DateTimeKind.Local)
+        {
+            throw new InvalidOperationException("Invalid start time zone");
+        }
+
+        if (stop.Kind != DateTimeKind.Utc && stop.Kind != DateTimeKind.Local)
+        {
+            throw new InvalidOperationException("Invalid stop time zone");
+        }
+
+        if (start > stop)
+        {
+            throw new InvalidOperationException("Start time cannot be after stop time");
+        }
+
+        if (start > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Start time cannot be greater than current time");
+        }
+
+        if (stop > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Stop time cannot be greater than current time");
+        }
+
+        if (start < DateTime.UtcNow.AddMonths(-3))
+        {
+            throw new InvalidOperationException("Start time cannot be older than 3 months");
+        }
+
+        return (start.ToString("yyyy-MM-ddTHH:mm:ssZ"), stop.ToString("yyyy-MM-ddTHH:mm:ssZ"));
     }
 
     private bool MatchKeyvalue(string vehicleBrand)
     {
         return clientDictionary.ContainsKey(vehicleBrand);
-    }
-
-    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
-    {
-        if(stopTime == default)
-            stopTime = DateTime.Now;
-
-        if(!MatchDateTimeValue(startTime, stopTime))
-            throw new ArgumentException("Invalid date time values");
-
-        if (!MatchKeyvalue(vehicleBrand))
-            throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
-
-        var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetIntervalStatusReportAsync(vin, tenant, startTime, stopTime);
-
-        await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
-
-        return vehicleIntervalStatus;
     }
 };
 

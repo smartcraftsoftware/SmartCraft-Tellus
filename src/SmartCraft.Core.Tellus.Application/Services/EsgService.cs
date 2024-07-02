@@ -24,20 +24,18 @@ public class EsgService : IEsgService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime = default)
+    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, string startTime, string stopTime = default)
     {
-        if(stopTime == default)
-            stopTime = DateTime.Now;
-
-        if(!MatchDateTimeValue(startTime, stopTime))
-            throw new ArgumentException("Invalid date time values");
+        (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
         if (!MatchKeyvalue(vehicleBrand))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
-        var esgReport = await clientDictionary[vehicleBrand.ToLower()].GetEsgReportAsync(vinNumber, tenant, startTime, stopTime);
+        var esgReport = await clientDictionary[vehicleBrand.ToLower()].GetEsgReportAsync(vinNumber, tenant, start, stop);
+        
         if(esgReport == null)
             return null;
+
         var validator = new EsgReportValidator();
         var validationResult = validator.Validate(esgReport);
 
@@ -54,18 +52,52 @@ public class EsgService : IEsgService
         return esgReport;
     }
 
-    private bool MatchDateTimeValue(DateTime startTime, DateTime stopTime)
+    private (string, string) ParseAndMatchDateTimeValues(string startTime, string stopTime)
     {
-        if(startTime > stopTime)
-            return false;
-        if(startTime > DateTime.Now)
-            return false;
-        if (stopTime > DateTime.Now)
-            return false;
-        if(startTime < DateTime.Now.AddMonths(-3))
-            return false;
+        if (!DateTime.TryParse(startTime, out var start))
+        {
+            throw new InvalidOperationException("Invalid start time format");
+        }
 
-        return true;
+        if (!DateTime.TryParse(stopTime, out var stop))
+        {
+            throw new InvalidOperationException("Invalid stop time format");
+        }
+
+        start = start.ToUniversalTime();
+        stop = stop.ToUniversalTime();
+
+        if (start.Kind != DateTimeKind.Utc && start.Kind != DateTimeKind.Local)
+        {
+            throw new InvalidOperationException("Invalid start time zone");
+        }
+
+        if (stop.Kind != DateTimeKind.Utc && stop.Kind != DateTimeKind.Local)
+        {
+            throw new InvalidOperationException("Invalid stop time zone");
+        }
+
+        if (start > stop)
+        {
+            throw new InvalidOperationException("Start time cannot be after stop time");
+        }
+
+        if (start > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Start time cannot be greater than current time");
+        }
+
+        if (stop > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Stop time cannot be greater than current time");
+        }
+
+        if (start < DateTime.UtcNow.AddMonths(-3))
+        {
+            throw new InvalidOperationException("Start time cannot be older than 3 months");
+        }
+           
+        return (start.ToString("yyyy-MM-ddTHH:mm:ssZ"), stop.ToString("yyyy-MM-ddTHH:mm:ssZ"));
     }
 
     private bool MatchKeyvalue(string vehicleBrand)

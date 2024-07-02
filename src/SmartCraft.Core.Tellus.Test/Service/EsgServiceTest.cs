@@ -23,12 +23,12 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .ReturnsAsync(new EsgVehicleReport() { StartTime = DateTime.Now.AddDays(-3), StopTime = DateTime.Now,  VehicleEvaluations = [] });
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
+                  .ReturnsAsync(new EsgVehicleReport() { StartTime = DateTime.UtcNow.AddDays(-3), StopTime = DateTime.UtcNow,  VehicleEvaluations = [] });
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.Now, DateTime.Now);
+        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString());
 
         //Assert
         result.Should().NotBeNull()
@@ -36,17 +36,17 @@ public class EsgServiceTest
            .VehicleEvaluations.Should().BeEmpty();
     }
 
-    public static TheoryData<string, DateTime, DateTime> Cases =
+    public static TheoryData<string, string, string> Cases =
     new()
     {
-        { "scania", DateTime.Now.AddYears(-2), DateTime.Now },
-        { "volvo", DateTime.Now, DateTime.Now.AddHours(-1) },
-        { "scania", DateTime.Now.AddMonths(4), DateTime.Now },
-        { "volvo", DateTime.Now.AddHours(1), DateTime.Now }
+        { "scania",DateTime.UtcNow.AddYears(-2).ToString(), DateTime.UtcNow.ToString() },
+        { "volvo", DateTime.UtcNow.ToString(), DateTime.UtcNow.AddHours(-1).ToString() },
+        { "scania",DateTime.UtcNow.AddMonths(4).ToString(), DateTime.UtcNow.ToString() },
+        { "volvo", DateTime.UtcNow.AddHours(1).ToString(), DateTime.UtcNow.ToString() }
 
     };
     [Theory, MemberData(nameof(Cases))]
-    public async Task Get_EsgReport_InvalidDateTimes_ThrowsArgumentException(string vehicleBrand, DateTime startTime, DateTime stopTime)
+    public async Task Get_EsgReport_Invalidstrings_ThrowsArgumentException(string vehicleBrand, string startTime, string stopTime)
     {
         //Arrange
         var tenant = new Tenant
@@ -54,7 +54,7 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
                   .ReturnsAsync(new EsgVehicleReport() { VehicleEvaluations = [] });
 
         var esgService = CreateService();
@@ -63,8 +63,8 @@ public class EsgServiceTest
         Func<Task> act = async () => await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, startTime, stopTime);
 
         //Assert
-        var exception = await act.Should().ThrowAsync<ArgumentException>().WithMessage("Invalid date time values");
-        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 
     }
 
@@ -79,13 +79,13 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
                   .ReturnsAsync((EsgVehicleReport)null);
 
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.Now, DateTime.Now);
+        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString());
 
         //Assert
         result.Should().BeNull();

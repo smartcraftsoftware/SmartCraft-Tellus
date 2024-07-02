@@ -32,12 +32,12 @@ public class VehicleServiceTest
         };
         var vin = "thisisvin";
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
           .ReturnsAsync(new StatusReport() { Vin = vin });
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 
         // Act
-        var result = await _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
+        var result = await _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString());
 
         // Assert
         Assert.NotNull(result);
@@ -55,11 +55,11 @@ public class VehicleServiceTest
             Id = Guid.NewGuid()
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException());
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new HttpRequestException());
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
        
         // Assert and Act
-        Task<HttpRequestException> task = Assert.ThrowsAsync<HttpRequestException>(() => _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow));
+        Task<HttpRequestException> task = Assert.ThrowsAsync<HttpRequestException>(() => _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString()));
     }
 
     [Theory]
@@ -73,12 +73,12 @@ public class VehicleServiceTest
             Id = Guid.NewGuid()
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new JsonException());
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new JsonException());
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 
 
         // Assert
-        Task<JsonException> task = Assert.ThrowsAsync<JsonException>(() => _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow));
+        Task<JsonException> task = Assert.ThrowsAsync<JsonException>(() => _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString()));
     }
 
     [Theory]

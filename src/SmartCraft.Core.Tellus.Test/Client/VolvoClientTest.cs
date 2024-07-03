@@ -266,11 +266,11 @@ public class VolvoClientTest
                 {
                     VehicleStatuses = new VehicleStatus[]
                     {
-                new VehicleStatus
-                {
-                    Vin = "thisisavin"
-                }
-            }
+                        new VehicleStatus
+                        {
+                            Vin = "thisisavin"
+                        }
+                    }
                 }))
             });
 

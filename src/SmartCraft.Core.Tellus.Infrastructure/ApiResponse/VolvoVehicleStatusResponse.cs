@@ -2,7 +2,7 @@
 public class VolvoVehicleStatusResponse
 {
     public bool MoreDataAvailable { get; set; }
-    public VolvoVehicleStatus[]? VehicleStatus { get; set; }
+    public VolvoVehicleStatus[] VehicleStatus { get; set; } = [];
 }
 
 public class VolvoVehicleStatus

@@ -82,7 +82,7 @@ public class EsgServiceTest
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .ReturnsAsync((EsgVehicleReport)null);
+                  .ReturnsAsync(null as EsgVehicleReport);
 
         var esgService = CreateService();
 

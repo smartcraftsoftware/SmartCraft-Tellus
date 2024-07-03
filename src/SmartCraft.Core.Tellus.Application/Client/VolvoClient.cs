@@ -119,8 +119,8 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         var param = new Dictionary<string, string>
         {
             { "vin", vin },
-            { "starttime", startTime.ToString() },
-            { "stoptime", stopTime.ToString() },
+            { "starttime", startTime.ToIso8601() },
+            { "stoptime", stopTime.ToIso8601() },
             { "triggerFilter", "TIMER" },
             { "contentFilter", "SNAPSHOT" },
             { "datetype", "received" }
@@ -149,7 +149,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         response.EnsureSuccessStatusCode();
         string responseContent = await response.Content.ReadAsStringAsync();
         var vehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
-        if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse.VehicleStatus.Length > 0)
+        if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse?.VehicleStatus?.Length > 0)
         {
             bool moreDataAvailable = true;
             while (moreDataAvailable)

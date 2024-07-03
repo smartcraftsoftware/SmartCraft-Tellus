@@ -32,10 +32,7 @@ public class EsgService : IEsgService
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
         var esgReport = await clientDictionary[vehicleBrand.ToLower()].GetEsgReportAsync(vinNumber, tenant, start, stop);
-        
-        if(esgReport == null)
-            return null;
-
+       
         var validator = new EsgReportValidator();
         var validationResult = validator.Validate(esgReport);
 

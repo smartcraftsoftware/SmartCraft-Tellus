@@ -23,12 +23,12 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync(new EsgVehicleReport() { StartTime = DateTime.UtcNow.AddDays(-3), StopTime = DateTime.UtcNow,  VehicleEvaluations = [] });
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString());
+        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
 
         //Assert
         result.Should().NotBeNull()
@@ -36,17 +36,17 @@ public class EsgServiceTest
            .VehicleEvaluations.Should().BeEmpty();
     }
 
-    public static TheoryData<string, string, string> Cases =
+    public static TheoryData<string, DateTime, DateTime> Cases =
     new()
     {
-        { "scania",DateTime.UtcNow.AddYears(-2).ToString(), DateTime.UtcNow.ToString() },
-        { "volvo", DateTime.UtcNow.ToString(), DateTime.UtcNow.AddHours(-1).ToString() },
-        { "scania",DateTime.UtcNow.AddMonths(4).ToString(), DateTime.UtcNow.ToString() },
-        { "volvo", DateTime.UtcNow.AddHours(1).ToString(), DateTime.UtcNow.ToString() }
+        { "scania",DateTime.UtcNow.AddYears(-2), DateTime.UtcNow },
+        { "volvo", DateTime.UtcNow, DateTime.UtcNow.AddHours(-1) },
+        { "scania",DateTime.UtcNow.AddMonths(4), DateTime.UtcNow },
+        { "volvo", DateTime.UtcNow.AddHours(1), DateTime.UtcNow }
 
     };
     [Theory, MemberData(nameof(Cases))]
-    public async Task Get_EsgReport_Invalidstrings_ThrowsArgumentException(string vehicleBrand, string startTime, string stopTime)
+    public async Task Get_EsgReport_Invalidstrings_ThrowsArgumentException(string vehicleBrand, DateTime startTime, DateTime stopTime)
     {
         //Arrange
         var tenant = new Tenant
@@ -54,7 +54,7 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync(new EsgVehicleReport() { VehicleEvaluations = [] });
 
         var esgService = CreateService();
@@ -64,7 +64,7 @@ public class EsgServiceTest
 
         //Assert
         var exception = await act.Should().ThrowAsync<InvalidOperationException>();
-        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
 
     }
 
@@ -79,13 +79,13 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<string>(), It.IsAny<string>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync((EsgVehicleReport)null);
 
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow.ToString(), DateTime.UtcNow.ToString());
+        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
 
         //Assert
         result.Should().BeNull();

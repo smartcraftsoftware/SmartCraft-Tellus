@@ -11,13 +11,11 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "volvo";
 
-    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, string startTime, string stopTime)
+    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
-        var start = DateTime.Parse(startTime);
-        var stop = DateTime.Parse(stopTime);
         var uriBuilder = !string.IsNullOrEmpty(vin) ?
-            ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={start:yyyy-MM-dd}&stoptime={stop:yyyy-MM-dd}") :
-            ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"?starttime={start:yyyy-MM-dd}&stoptime={stop:yyyy-MM-dd}");
+            ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}") :
+            ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"?starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}");
         
         var credentials = tenant.VolvoCredentials ?? "";
         if (string.IsNullOrEmpty(credentials))
@@ -84,7 +82,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         return vehicleList ?? new List<Vehicle>();
     }
 
-    public async Task<StatusReport> GetVehicleStatusAsync(string? vin, Tenant tenant, string startTime, string? stopTime)
+    public async Task<StatusReport> GetVehicleStatusAsync(string? vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", $"vin={vin}&starttime={startTime}&stoptime={stopTime}&latestonly=true");
         var credentials = tenant?.VolvoCredentials ?? "";
@@ -112,17 +110,17 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
-    public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, string startTime, string stopTime) {
+    public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime) {
 
-        TimeSpan ts = DateTime.UtcNow - DateTime.Parse(startTime);
+        TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)
             throw new HttpRequestException("Volvo: only the last 14 days are available!", null, HttpStatusCode.BadRequest);
 
         var param = new Dictionary<string, string>
         {
             { "vin", vin },
-            { "starttime", startTime },
-            { "stoptime", stopTime },
+            { "starttime", startTime.ToString() },
+            { "stoptime", stopTime.ToString() },
             { "triggerFilter", "TIMER" },
             { "contentFilter", "SNAPSHOT" },
             { "datetype", "received" }

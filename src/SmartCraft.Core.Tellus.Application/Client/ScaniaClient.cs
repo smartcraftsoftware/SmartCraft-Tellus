@@ -13,7 +13,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
     public string VehicleBrand => "scania";
     string? token;
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, string startTime, string stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         token ??= await AuthScania(tenant);
 
@@ -79,7 +79,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return vehicleApiResponse?.VehicleResponse?.Vehicles?.Select(x => x.ToDomainModel()).ToList() ?? new List<Vehicle>();
     }
 
-    public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, string startTime, string? stopTime)
+    public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
         token ??= await AuthScania(tenant); 
 
@@ -88,8 +88,8 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         var param = new Dictionary<string, string>
         {
             { "vin", vin },
-            { "starttime", startTime },
-            { "stoptime", stopTime ?? DateTime.UtcNow.ToString() },
+            { "starttime", startTime.ToString() },
+            { "stoptime", stopTime == null ? DateTime.UtcNow.ToString() : stopTime.ToString() },
             { "triggerFilter", "TIMER" },
             { "contentFilter", "SNAPSHOT" },
             { "datetype", "received" }
@@ -161,7 +161,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return Base64Url.Encode(challengeResponse);
     }
 
-    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, string startTime, string stopTime)
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         throw new NotImplementedException();
     }

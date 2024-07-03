@@ -6,12 +6,12 @@ public class DaimlerClient : IVehicleClient
 {
     public string VehicleBrand => "daimler";
 
-    public Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, string startTime, string stopTime)
+    public Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, string startTime, string stopTime)
+    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         throw new NotImplementedException();
     }
@@ -21,7 +21,7 @@ public class DaimlerClient : IVehicleClient
         throw new NotImplementedException();
     }
 
-    public Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, string startTime, string? stopTime)
+    public Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
         throw new NotImplementedException();
     }

@@ -25,7 +25,7 @@ public class VehiclesService : IVehiclesService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, string startTime, string stopTime)
+    public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
@@ -44,7 +44,7 @@ public class VehiclesService : IVehiclesService
         return vehicles;
     }
 
-    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, string startTime, string stopTime)
+    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
@@ -58,52 +58,34 @@ public class VehiclesService : IVehiclesService
         return vehicleIntervalStatus;
     }
 
-    private (string, string) ParseAndMatchDateTimeValues(string startTime, string stopTime)
+    private (DateTime, DateTime) ParseAndMatchDateTimeValues(DateTime startTime, DateTime stopTime)
     {
-        if (!DateTime.TryParse(startTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out var start))
-        {
-            throw new InvalidOperationException("Invalid start time format");
-        }
+        if (startTime.Kind == DateTimeKind.Unspecified)
+            throw new InvalidOperationException("Start time needs to have timezone specified");
+        if (stopTime.Kind == DateTimeKind.Unspecified)
+            throw new InvalidOperationException("Stop time needs to have timezone specified");
 
-        if (!DateTime.TryParse(stopTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out var stop))
-        {
-            throw new InvalidOperationException("Invalid stop time format");
-        }
-
-        start = start.ToUniversalTime();
-        stop = stop.ToUniversalTime();
-
-        if (start.Kind != DateTimeKind.Utc && start.Kind != DateTimeKind.Local)
-        {
-            throw new InvalidOperationException("Invalid start time zone");
-        }
-
-        if (stop.Kind != DateTimeKind.Utc && stop.Kind != DateTimeKind.Local)
-        {
-            throw new InvalidOperationException("Invalid stop time zone");
-        }
-
-        if (start > stop)
+        if (startTime > stopTime)
         {
             throw new InvalidOperationException("Start time cannot be after stop time");
         }
 
-        if (start > DateTime.UtcNow)
+        if (startTime > DateTime.UtcNow)
         {
             throw new InvalidOperationException("Start time cannot be greater than current time");
         }
 
-        if (stop > DateTime.UtcNow)
+        if (stopTime > DateTime.UtcNow)
         {
             throw new InvalidOperationException("Stop time cannot be greater than current time");
         }
 
-        if (start < DateTime.UtcNow.AddMonths(-3))
+        if (startTime < DateTime.UtcNow.AddMonths(-3))
         {
             throw new InvalidOperationException("Start time cannot be older than 3 months");
         }
 
-        return (start.ToString("yyyy-MM-ddTHH:mm:ssZ"), stop.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+        return (startTime, stopTime);
     }
 
     private bool MatchKeyvalue(string vehicleBrand)

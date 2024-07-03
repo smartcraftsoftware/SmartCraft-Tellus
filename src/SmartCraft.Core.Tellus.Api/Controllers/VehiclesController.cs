@@ -58,15 +58,15 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
     /// <param name="vinOrId">Vin number or external id of vehicle. 
     /// If excluded, will fetch all vehicles of current user's fleet.</param>
-    /// <param name="startTime">Start time of interval</param>
-    /// <param name="stopTime">Stop time of interval</param>
+    /// <param name="startTime">Start time of interval (yyyy-MM-dd)</param>
+    /// <param name="stopTime">Stop time of interval (yyyy-MM-dd)</param>
     /// <param name="tenantId">Id of tenant</param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/esgreport")]
-    public async Task<ActionResult<EsgReportResponse>> GetEsgReportAsync(string vehicleBrand, string? vinOrId, string startTime, string stopTime, [FromHeader] Guid tenantId)
+    public async Task<ActionResult<EsgReportResponse>> GetEsgReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
     {
         try
         {
@@ -100,14 +100,14 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// </summary>
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
     /// <param name="vinOrId">Vin number or external id of vehicle.
-    /// <param name="startTime">Start time of interval</param>
-    /// <param name="stopTime">Stop time of interval</param>
+    /// <param name="startTime">Start time of interval (yyyy-MM-dd hh:mm:ss)</param>
+    /// <param name="stopTime">Stop time of interval (yyyy-MM-dd hh:mm:ss)</param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/statusreport")]
-    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, string startTime, string stopTime, [FromHeader] Guid tenantId)
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
     {
         try
         {

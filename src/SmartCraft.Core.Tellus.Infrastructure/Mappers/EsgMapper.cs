@@ -155,12 +155,12 @@ public static class EsgMapper
     #endregion
 
     #region Scania
-    public static Domain.Models.EsgVehicleReport ToDomainModel(this ScaniaVehicleEvaluationApiResponse apiResponse, string startTime, string? stopTime)
+    public static Domain.Models.EsgVehicleReport ToDomainModel(this ScaniaVehicleEvaluationApiResponse apiResponse, DateTime startTime, DateTime? stopTime)
     {
         return new Domain.Models.EsgVehicleReport
         {
-            StartTime = DateTime.Parse(startTime),
-            StopTime = string.IsNullOrEmpty(stopTime) ? DateTime.Parse(stopTime) : DateTime.UtcNow,
+            StartTime = startTime,
+            StopTime = stopTime,
             VehicleEvaluations = apiResponse?.VehicleList?.Select(x => x.ToDomainModel()).ToList() ?? new List<Domain.Models.VehicleEvaluation>()
         };
     }

@@ -13,7 +13,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
     public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
-        var uriBuilder = string.IsNullOrEmpty(vin) ?
+        var uriBuilder = !string.IsNullOrEmpty(vin) ?
             ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}") :
             ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"?starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}");
         
@@ -84,7 +84,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
     public async Task<StatusReport> GetVehicleStatusAsync(string? vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
-        var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", $"vin={vin}&starttime={startTime.ToIso8601()}&stoptime={stopTime.ToIso8601()}&latestonly=true");
+        var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", $"vin={vin}&starttime={startTime}&stoptime={stopTime}&latestonly=true");
         var credentials = tenant?.VolvoCredentials ?? "";
         if (string.IsNullOrEmpty(credentials))
             throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
@@ -111,7 +111,8 @@ public class VolvoClient(HttpClient client) : IVehicleClient
     }
 
     public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime) {
-        TimeSpan ts = DateTime.Now - startTime;
+
+        TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)
             throw new HttpRequestException("Volvo: only the last 14 days are available!", null, HttpStatusCode.BadRequest);
 
@@ -127,8 +128,9 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
         var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", param);
         var credentials = tenant?.VolvoCredentials ?? "";
+
         if (string.IsNullOrEmpty(credentials))
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString("Invalid credentials"));
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {
@@ -147,7 +149,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         response.EnsureSuccessStatusCode();
         string responseContent = await response.Content.ReadAsStringAsync();
         var vehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
-        if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse.VehicleStatus.Length > 0)
+        if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse?.VehicleStatus?.Length > 0)
         {
             bool moreDataAvailable = true;
             while (moreDataAvailable)

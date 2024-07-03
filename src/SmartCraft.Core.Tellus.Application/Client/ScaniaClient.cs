@@ -18,8 +18,8 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         token ??= await AuthScania(tenant);
 
         var uriBuilder = string.IsNullOrEmpty(vin) ?
-            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime:yyyy-MM-dd}&endDate={stopTime:yyyy-MM-dd}") :
-            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime:yyyy-MM-dd}&endDate={stopTime:yyyy-MM-dd}&vinOfInterest={vin}");
+            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime}&endDate={stopTime}") :
+            ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime}&endDate={stopTime}&vinOfInterest={vin}");
 
         if (token == null)
             throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
@@ -47,6 +47,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         return esgResponse.ToDomainModel(startTime, stopTime);
     }
+
     public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehicles", "");
@@ -84,8 +85,16 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         if (token == null)
             throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
-
-        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", $"vin={vin}&latestonly=true");
+        var param = new Dictionary<string, string>
+        {
+            { "vin", vin },
+            { "starttime", startTime.ToString() },
+            { "stoptime", stopTime.ToString() ?? DateTime.UtcNow.ToString() },
+            { "triggerFilter", "TIMER" },
+            { "contentFilter", "SNAPSHOT" },
+            { "datetype", "received" }
+        };
+        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {

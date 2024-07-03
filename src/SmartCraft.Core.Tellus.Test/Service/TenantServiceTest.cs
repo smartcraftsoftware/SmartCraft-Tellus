@@ -34,10 +34,10 @@ public class TenantServiceTest
 
         //Assert
         Assert.Equal(tenant.Id, result?.Id);
-        Assert.Equal(tenant.DaimlerToken, result.DaimlerToken);
-        Assert.Equal(tenant.ManToken, result.ManToken);
-        Assert.Equal(tenant.ScaniaClientId, result.ScaniaClientId);
-        Assert.Equal(tenant.ScaniaSecretKey, result.ScaniaSecretKey);
+        Assert.Equal(tenant.DaimlerToken, result?.DaimlerToken);
+        Assert.Equal(tenant.ManToken, result?.ManToken);
+        Assert.Equal(tenant.ScaniaClientId, result?.ScaniaClientId);
+        Assert.Equal(tenant.ScaniaSecretKey, result?.ScaniaSecretKey);
         repositoryMock.Verify(x => x.Get(tenant.Id), Times.Once);
     }
 
@@ -45,7 +45,7 @@ public class TenantServiceTest
     public void GetTenantAsync_Fails_TenantNotExists()
     {
         // Arrange
-        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Infrastructure.Models.Tenant?)null);
+        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(null as Infrastructure.Models.Tenant);
 
         //Act and Assert
         Task<NullReferenceException> exc = Assert.ThrowsAsync<NullReferenceException>(async () => await service.GetTenantAsync(Guid.NewGuid()));

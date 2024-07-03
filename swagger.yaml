@@ -197,13 +197,13 @@ paths:
             type: string
         - name: startTime
           in: query
-          description: Start time of interval
+          description: Start time of interval (yyyy-MM-dd)
           schema:
             type: string
             format: date-time
         - name: stopTime
           in: query
-          description: Stop time of interval
+          description: Stop time of interval (yyyy-MM-dd)
           schema:
             type: string
             format: date-time
@@ -233,31 +233,38 @@ paths:
     get:
       tags:
         - Vehicles
+      summary: Gets a summarized environmental status report for a vehicle
       parameters:
         - name: vehicleBrand
           in: path
+          description: Brand of vehicle to fetch
           required: true
-          schema:
-            type: string
-        - name: vinOrId
-          in: query
           schema:
             type: string
         - name: startTime
           in: query
+          description: Start time of interval (yyyy-MM-dd hh:mm:ss)
           schema:
             type: string
             format: date-time
         - name: stopTime
           in: query
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
           schema:
             type: string
             format: date-time
         - name: tenantId
           in: header
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
           schema:
             type: string
             format: uuid
+        - name: vinOrId
+          in: query
+          description: Vin number or external id of vehicle.
+          schema:
+            type: string
+            default: ''
         - name: version
           in: path
           required: true
@@ -265,11 +272,15 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
+          description: Returns a vehicle status report
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntervalStatusReportResponse'
+        '404':
+          description: Could not find vehicle
+        '500':
+          description: Internal server error
 components:
   schemas:
     AddTenantRequest:
@@ -379,34 +390,42 @@ components:
           nullable: true
         startDateTime:
           type: string
+          description: Start time of interval
           format: date-time
           nullable: true
         endDateTime:
           type: string
+          description: Stop time of interval
           format: date-time
           nullable: true
         hrTotalVehicleDistance:
           type: number
+          description: Accumulated distance travelled by the vehicle during its operation in meter
           format: double
           nullable: true
         totalEngineHours:
           type: number
+          description: The total hours of operation for the vehicle engine.
           format: double
           nullable: true
         totalElectricMotorHours:
           type: number
+          description: The total hours the electric motor is ready for propulsion
           format: double
           nullable: true
         engineTotalFuelUsed:
           type: number
+          description: Total fuel usage within the interval. In millilitres.
           format: double
           nullable: true
         totalGaseousFuelUsed:
           type: number
+          description: "Total fuel consumed in kg (trip drive fuel + trip PTO governor moving\r\nfuel + trip PTO governor non-moving fuel + trip idle fuel)"
           format: double
           nullable: true
         totalElectricEnergyUsed:
           type: number
+          description: "Total electric energy consumed by the vehicle, excluding when  plugged\r\nin (vehicle coupler) for charging, (incl.motor, PTO, cooling, etc.)\r\nin watt hours.Recuperation is subtracted from the value."
           format: double
           nullable: true
       additionalProperties: false

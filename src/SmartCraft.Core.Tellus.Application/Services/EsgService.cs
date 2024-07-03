@@ -26,18 +26,13 @@ public class EsgService : IEsgService
 
     public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime = default)
     {
-        if(stopTime == default)
-            stopTime = DateTime.Now;
-
-        if(!MatchDateTimeValue(startTime, stopTime))
-            throw new ArgumentException("Invalid date time values");
+        (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
         if (!MatchKeyvalue(vehicleBrand))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
-        var esgReport = await clientDictionary[vehicleBrand.ToLower()].GetEsgReportAsync(vinNumber, tenant, startTime, stopTime);
-        if(esgReport == null)
-            return null;
+        var esgReport = await clientDictionary[vehicleBrand.ToLower()].GetEsgReportAsync(vinNumber, tenant, start, stop);
+       
         var validator = new EsgReportValidator();
         var validationResult = validator.Validate(esgReport);
 
@@ -54,18 +49,36 @@ public class EsgService : IEsgService
         return esgReport;
     }
 
-    private bool MatchDateTimeValue(DateTime startTime, DateTime stopTime)
+    private (DateTime, DateTime) ParseAndMatchDateTimeValues(DateTime startTime, DateTime stopTime)
     {
-        if(startTime > stopTime)
-            return false;
-        if(startTime > DateTime.Now)
-            return false;
-        if (stopTime > DateTime.Now)
-            return false;
-        if(startTime < DateTime.Now.AddMonths(-3))
-            return false;
+        if (startTime.Kind == DateTimeKind.Unspecified)
+            throw new InvalidOperationException("Start time needs to have timezone specified");
+        if (stopTime.Kind == DateTimeKind.Unspecified)
+            throw new InvalidOperationException("Stop time needs to have timezone specified");
 
-        return true;
+        if (startTime > stopTime)
+        {
+            throw new InvalidOperationException("Start time cannot be after stop time");
+        }
+
+        var utcStartTime = startTime.ToUniversalTime();
+        if (utcStartTime > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Start time cannot be greater than current time");
+        }
+
+        var utcStopTime = stopTime.ToUniversalTime();
+        if (utcStopTime > DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Stop time cannot be greater than current time");
+        }
+
+        if (utcStartTime < DateTime.UtcNow.AddMonths(-3))
+        {
+            throw new InvalidOperationException("Start time cannot be older than 3 months");
+        }
+
+        return (startTime, stopTime);
     }
 
     private bool MatchKeyvalue(string vehicleBrand)

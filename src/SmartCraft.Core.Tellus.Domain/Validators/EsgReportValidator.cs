@@ -6,10 +6,10 @@ public class EsgReportValidator : AbstractValidator<EsgVehicleReport>
 {
     public EsgReportValidator()
     {
-        RuleFor(x => x.StartTime).NotEmpty().LessThanOrEqualTo(DateTime.Now);
+        RuleFor(x => x.StartTime).NotEmpty().LessThanOrEqualTo(DateTime.UtcNow);
 
         RuleFor(x => x.StopTime).NotEmpty().When(x => x.StopTime.HasValue)
-            .LessThanOrEqualTo(DateTime.Now).When(x => x.StopTime.HasValue)
+            .LessThanOrEqualTo(DateTime.UtcNow).When(x => x.StopTime.HasValue)
             .GreaterThanOrEqualTo(x=> x.StartTime).When(x => x.StopTime.HasValue);
         
         RuleForEach(x => x.VehicleEvaluations).SetValidator(new VehicleEvaluationValidator()).When(x => x.VehicleEvaluations?.Count > 0);

@@ -58,8 +58,8 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
     /// <param name="vinOrId">Vin number or external id of vehicle. 
     /// If excluded, will fetch all vehicles of current user's fleet.</param>
-    /// <param name="startTime">Start time of interval</param>
-    /// <param name="stopTime">Stop time of interval</param>
+    /// <param name="startTime">Start time of interval (yyyy-MM-dd)</param>
+    /// <param name="stopTime">Stop time of interval (yyyy-MM-dd)</param>
     /// <param name="tenantId">Id of tenant</param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
@@ -77,7 +77,6 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
                 logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
             }
-
 
             var vehicle = await esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
             if (vehicle == null)
@@ -100,15 +99,16 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// Gets a summarized environmental status report for a vehicle
     /// </summary>
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
-    /// <param name="vinOrId">Vin number or external id of vehicle.
-    /// <param name="startTime">Start time of interval</param>
-    /// <param name="stopTime">Stop time of interval</param>
+    /// <param name="vinOrId">Vin number or external id of vehicle.</param>
+    /// <param name="startTime">Start time of interval (yyyy-MM-dd hh:mm:ss)</param>
+    /// <param name="stopTime">Stop time of interval (yyyy-MM-dd hh:mm:ss)</param>
+    /// <param name="tenantId">Stop time of interval (yyyy-MM-dd hh:mm:ss)</param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/statusreport")]
-    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, string vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, string vinOrId = "")
     {
         try
         {
@@ -130,7 +130,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
         }
         catch (HttpRequestException ex)
         {
-            logger.Log(LogLevel.Error, $"The vehicle client threw an HTTP request exception: \"{(int)ex.StatusCode} {ex.Message}\"");
+            logger.Log(LogLevel.Error, $"The vehicle client threw an HTTP request exception: \"{(int?)ex.StatusCode} {ex.Message}\"");
             return StatusCode((int)ex.StatusCode, ex.Message);
         }
         catch (Exception ex)

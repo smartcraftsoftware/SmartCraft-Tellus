@@ -40,7 +40,7 @@ public class VehiclesControllerTest
     public async Task Get_Vehicles_MissingTenant()
     {   // Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync((Tenant)null);
+        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
         esgServiceMock.Setup(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
         // Act
@@ -83,7 +83,7 @@ public class VehiclesControllerTest
         });
 
         //Act
-        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.Now, DateTime.Now, Guid.NewGuid());
+        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         //Assert
         Assert.IsType<ActionResult<EsgReportResponse>>(result);
@@ -96,7 +96,7 @@ public class VehiclesControllerTest
     public async Task Get_EsgReport_MissingTenant()
     {   // Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync((Tenant)null);
+        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new EsgVehicleReport
             {
@@ -104,7 +104,7 @@ public class VehiclesControllerTest
         });
 
         // Act
-        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.Now, DateTime.Now, Guid.NewGuid());
+        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
@@ -119,10 +119,10 @@ public class VehiclesControllerTest
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync((EsgVehicleReport)null);
+            .ReturnsAsync(null as EsgVehicleReport);
 
         // Act
-        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.Now, DateTime.Now, Guid.NewGuid());
+        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
@@ -139,7 +139,7 @@ public class VehiclesControllerTest
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception());
 
         // Act
-        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.Now, DateTime.Now, Guid.NewGuid());
+        var result = await controller.GetEsgReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         // Assert
         Assert.IsType<ObjectResult>(result.Result);

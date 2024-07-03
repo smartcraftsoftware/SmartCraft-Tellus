@@ -45,7 +45,7 @@ public class TenantControllerTest
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync((Tenant)null);
+        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
 
         //Act
         var result = await controller.Get(Guid.NewGuid());

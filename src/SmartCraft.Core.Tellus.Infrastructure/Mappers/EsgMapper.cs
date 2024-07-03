@@ -136,7 +136,6 @@ public static class EsgMapper
                 TotalFuelConsumption = totalFuelConsumption,
                 FuelConsumptionPerHour = totalFuelConsumption / totalHours,
             }
-
         };
     }
     private static Domain.Models.VehicleEvaluation ToDomainModel(this UtilizationVehicle vehicle, double totalHours)

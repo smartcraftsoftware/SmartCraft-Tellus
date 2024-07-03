@@ -42,11 +42,13 @@ public class EsgServiceTest
         { "scania",DateTime.UtcNow.AddYears(-2), DateTime.UtcNow },
         { "volvo", DateTime.UtcNow, DateTime.UtcNow.AddHours(-1) },
         { "scania",DateTime.UtcNow.AddMonths(4), DateTime.UtcNow },
-        { "volvo", DateTime.UtcNow.AddHours(1), DateTime.UtcNow }
+        { "volvo", DateTime.UtcNow.AddHours(1), DateTime.UtcNow },
+        { "volvo", DateTime.Parse("2024-06-28"), DateTime.UtcNow },
+        { "volvo", DateTime.UtcNow, DateTime.Parse("2024-06-28") }
 
     };
     [Theory, MemberData(nameof(Cases))]
-    public async Task Get_EsgReport_Invalidstrings_ThrowsArgumentException(string vehicleBrand, DateTime startTime, DateTime stopTime)
+    public async Task Get_EsgReport_InvalidDateTimes_ThrowsInvalidOperationException(string vehicleBrand, DateTime startTime, DateTime stopTime)
     {
         //Arrange
         var tenant = new Tenant

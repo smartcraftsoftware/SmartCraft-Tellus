@@ -64,17 +64,19 @@ public class EsgService : IEsgService
             throw new InvalidOperationException("Start time cannot be after stop time");
         }
 
-        if (startTime > DateTime.UtcNow)
+        var utcStartTime = startTime.ToUniversalTime();
+        if (utcStartTime > DateTime.UtcNow)
         {
             throw new InvalidOperationException("Start time cannot be greater than current time");
         }
 
-        if (stopTime > DateTime.UtcNow)
+        var utcStopTime = stopTime.ToUniversalTime();
+        if (utcStopTime > DateTime.UtcNow)
         {
             throw new InvalidOperationException("Stop time cannot be greater than current time");
         }
 
-        if (startTime < DateTime.UtcNow.AddMonths(-3))
+        if (utcStartTime < DateTime.UtcNow.AddMonths(-3))
         {
             throw new InvalidOperationException("Start time cannot be older than 3 months");
         }

@@ -58,14 +58,16 @@ The vehicle brands currently supported by the API are "Volvo", "Scania" and "MAN
 By making a GET request to the _/Vehicles/{vehicleBrand}/Vehicles_ endpoint you will get a list of vehicles in your fleet.
 
 **Get report**</br>
-By making a GET request to the _/Vehicles/{vehicleBrand}/EsgReport_ you will get a report for vehicle(s)
+By making a GET request to the _/Vehicles/{vehicleBrand}/Report_ you will get a report for vehicle(s).
+This report are summarized based on full days and does not accept specific timestamps.
 Some queries are required, while some are optional.
 - VinOrId(optional) - If excluded, this endpoint will fetch all vehicles in your fleet.
 - StartTime (required) - formatted as YYYYMMDD.
 - StopTime (optional) - formatted as YYYYMMDD. If excluded, will default to the current date in UTC.
 
 - **Get intervalreport**</br>
-By making a GET request to the _/Vehicles/{vehicleBrand}/StatusReport you will get an intervalreport for a vehicle.
+By making a GET request to the _/Vehicles/{vehicleBrand}/VehicleStatus you will get an intervalreport for a vehicle.
+This is a summarized report based on specific timestamps. 
 Some queries are required, while some are optional.
 - StartTime (required) - formatted as yyyy-MM-dd hh:mm:ssZ .
 - StopTime (optional) - formatted as yyyy-MM-dd hh:mm:ssZ. If excluded, will default to the current date and time in UTC.

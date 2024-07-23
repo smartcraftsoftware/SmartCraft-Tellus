@@ -16,7 +16,7 @@ You do this by making a POST request to the _/Tenants_ endpoint and entering the
   "scaniaSecretKey": "string",</br>
   "manToken": "string",</br>
 
-Your credentials can always be added/updated by making a PATCH request to the _/Tenants/{ID}_ endpoint
+Your credentials can always be added/updated by making a PATCH request to the _/Tenants_ endpoint
 
 ### Credentials specification
 To access a users data from, for example, their Scania trucks, you need to retrieve their Scania API client credentials.
@@ -51,9 +51,6 @@ necessary credentials.
 ## Vehicles
 
 ### Make a request
-**TenantId**</br>
-All requests made to Tellus requires your _tenantId_ to be added as a header.
-
 **Vehicle brands**</br>
 The vehicle brands currently supported by the API are "Volvo", "Scania" and "MAN", with "Daimler" being on the roadmap.
 
@@ -65,4 +62,10 @@ By making a GET request to the _/Vehicles/{vehicleBrand}/EsgReport_ you will get
 Some queries are required, while some are optional.
 - VinOrId(optional) - If excluded, this endpoint will fetch all vehicles in your fleet.
 - StartTime (required) - formatted as YYYYMMDD.
-- StopTime (optional) - formatted as YYYYMMDD. If excluded, will default to the current date.
+- StopTime (optional) - formatted as YYYYMMDD. If excluded, will default to the current date in UTC.
+
+- **Get intervalreport**</br>
+By making a GET request to the _/Vehicles/{vehicleBrand}/StatusReport you will get an intervalreport for a vehicle.
+Some queries are required, while some are optional.
+- StartTime (required) - formatted as yyyy-MM-dd hh:mm:ssZ .
+- StopTime (optional) - formatted as yyyy-MM-dd hh:mm:ssZ. If excluded, will default to the current date and time in UTC.

@@ -65,7 +65,7 @@ Some queries are required, while some are optional.
 - StartTime (required) - formatted as YYYYMMDD.
 - StopTime (optional) - formatted as YYYYMMDD. If excluded, will default to the current date in UTC.
 
-- **Get intervalreport**</br>
+- **Get vehicle status report**</br>
 By making a GET request to the _/Vehicles/{vehicleBrand}/VehicleStatus you will get an intervalreport for a vehicle.
 This is a summarized report based on specific timestamps. 
 Some queries are required, while some are optional.

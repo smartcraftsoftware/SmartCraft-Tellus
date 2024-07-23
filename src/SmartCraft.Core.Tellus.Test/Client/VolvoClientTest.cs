@@ -221,7 +221,9 @@ public class VolvoClientTest
                     [
                         new VolvoVehicleStatus
                         {
-                            Vin = "thisisavin"
+                            Vin = "thisisavin",
+                            CreatedDateTime = DateTime.UtcNow.AddDays(-1),
+                            ReceivedDateTime = DateTime.UtcNow
                         }
                     ]
                 }))
@@ -235,7 +237,7 @@ public class VolvoClientTest
 
         //Assert
         result.Should().NotBeNull()
-            .And.BeOfType<StatusReport>();
+            .And.BeOfType<IntervalStatusReport>();
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),

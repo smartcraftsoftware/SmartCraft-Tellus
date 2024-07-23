@@ -5,9 +5,9 @@ namespace SmartCraft.Core.Tellus.Api.Mappers;
 
 public static class EsgMapper
 {
-    public static EsgReportResponse ToResponse(this EsgVehicleReport report)
+    public static VehicleEvaluationReportResponse ToResponse(this EsgVehicleReport report)
     {
-        return new EsgReportResponse
+        return new VehicleEvaluationReportResponse
         {
             StartTime = report.StartTime,
             StopTime = report.StopTime,

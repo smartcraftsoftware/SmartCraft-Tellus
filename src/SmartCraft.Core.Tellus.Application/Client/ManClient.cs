@@ -36,7 +36,7 @@ public class ManClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
-    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         throw new NotImplementedException();
     }
@@ -65,30 +65,30 @@ public class ManClient(HttpClient client) : IVehicleClient
         return jsonObject.Select(x => x.ToDomainModel()).ToList();
     }
 
-    public async Task<StatusReport> GetVehicleStatusAsync(string id, Tenant tenant, DateTime startTime, DateTime? stopTime)
-    {
-        
-        UriBuilder uriBuilder = ClientHelpers.BuildUri($"assets", $"assets/{id}", $"identification_type=vin&status=active");
-        var credentials = tenant.ManToken ?? "";
-
-        Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
-        {
-            { "Accept", $"application/json" },
-            { "Authorization", "Basic " + CredentialsAsB64String(credentials) }
-        };
-        var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
-
-        #pragma warning disable CS8603
-        var response = await client.SendAsync(request);
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            return null;
-        #pragma warning restore CS8603
-        response.EnsureSuccessStatusCode();
-
-        var jsonObject = JsonSerializer.Deserialize<ManTelematicsApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
-
-        return jsonObject.ToDomainModel();
-    }
+    //public async Task<StatusReport> GetVehicleStatusAsync(string id, Tenant tenant, DateTime startTime, DateTime? stopTime)
+    //{
+    //    
+    //    UriBuilder uriBuilder = ClientHelpers.BuildUri($"assets", $"assets/{id}", $"identification_type=vin&status=active");
+    //    var credentials = tenant.ManToken ?? "";
+    //
+    //    Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
+    //    {
+    //        { "Accept", $"application/json" },
+    //        { "Authorization", "Basic " + CredentialsAsB64String(credentials) }
+    //    };
+    //    var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+    //
+    //    #pragma warning disable CS8603
+    //    var response = await client.SendAsync(request);
+    //    if (response.StatusCode == HttpStatusCode.NotFound)
+    //        return null;
+    //    #pragma warning restore CS8603
+    //    response.EnsureSuccessStatusCode();
+    //
+    //    var jsonObject = JsonSerializer.Deserialize<ManTelematicsApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
+    //
+    //    return jsonObject.ToDomainModel();
+    //}
 
     private string CredentialsAsB64String(string credentials)
     {

@@ -4,8 +4,8 @@ namespace SmartCraft.Core.Tellus.Domain.Services;
 
 public interface IVehiclesService
 {
-    Task<List<Vehicle>> GetFleetAsync(string vehicleBrand, Tenant tenant);
-    Task<StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime);
+    Task<List<Vehicle>> GetVehiclesAsync(string vehicleBrand, Tenant tenant);
+    //Task<StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime);
 
-    Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime);
+    Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime);
 }

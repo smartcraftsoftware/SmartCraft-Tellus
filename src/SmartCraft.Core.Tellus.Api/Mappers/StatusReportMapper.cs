@@ -5,20 +5,6 @@ namespace SmartCraft.Core.Tellus.Api.Mappers;
 
 public static class StatusReportMapper
 {
-    public static StatusReportResponse ToResponse(this StatusReport statusReport)
-    {
-        return new StatusReportResponse
-        {
-            Vin = statusReport.Vin,
-            HrTotalVehicleDistance = statusReport.HrTotalVehicleDistance,
-            TotalEngineHours = statusReport.TotalEngineHours,
-            TotalElectricMotorHours = statusReport.TotalElectricMotorHours,
-            EngineTotalFuelUsed = statusReport.EngineTotalFuelUsed,
-            TotalGaseousFuelUsed = statusReport.TotalGaseousFuelUsed,
-            TotalElectricEnergyUsed = statusReport.TotalElectricEnergyUsed,
-        };
-    }
-
     public static IntervalStatusReportResponse ToIntervalRespone(this IntervalStatusReport statusReport)
     {
         return new IntervalStatusReportResponse

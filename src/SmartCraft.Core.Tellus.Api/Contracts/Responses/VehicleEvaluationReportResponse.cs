@@ -1,6 +1,6 @@
 ﻿namespace SmartCraft.Core.Tellus.Api.Contracts.Responses;
 
-public class EsgReportResponse
+public class VehicleEvaluationReportResponse
 {
     public DateTime StartTime { get; set; }
     public DateTime? StopTime { get; set; }

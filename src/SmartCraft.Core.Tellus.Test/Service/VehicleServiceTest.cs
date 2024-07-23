@@ -33,7 +33,7 @@ public class VehicleServiceTest
         var vin = "thisisvin";
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-          .ReturnsAsync(new StatusReport() { Vin = vin });
+          .ReturnsAsync(new IntervalStatusReport() { Vin = vin });
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 
         // Act
@@ -99,7 +99,7 @@ public class VehicleServiceTest
 
 
         // Act
-        var result = await _vehiclesService.GetFleetAsync(vehicleBrand, tenant);
+        var result = await _vehiclesService.GetVehiclesAsync(vehicleBrand, tenant);
 
         // Assert
         Assert.NotNull(result);

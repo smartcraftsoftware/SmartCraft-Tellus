@@ -80,89 +80,43 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return vehicleApiResponse?.VehicleResponse?.Vehicles?.Select(x => x.ToDomainModel()).ToList() ?? new List<Vehicle>();
     }
 
-    public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
-    {
-        token ??= await AuthScania(tenant); 
+    //public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
+    //{
+    //    token ??= await AuthScania(tenant); 
+    //
+    //    if (token == null)
+    //        throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+    //    var param = new Dictionary<string, string>
+    //    {
+    //        { "vin", vin },
+    //        { "starttime", startTime.ToString() },
+    //        { "stoptime", stopTime.ToString() ?? DateTime.UtcNow.ToString() },
+    //        { "triggerFilter", "TIMER" },
+    //        { "contentFilter", "SNAPSHOT" },
+    //        { "datetype", "received" }
+    //    };
+    //    var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
+    //
+    //    Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
+    //    {
+    //        { "Authorization", "Bearer " + token },
+    //        { "accept", "application/json; rfms=vehiclestatuses.v4.0" }
+    //    };
+    //    var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+    //
+    //    #pragma warning disable CS8603 // Possible null reference return.
+    //    var response = await client.SendAsync(request);
+    //    if (response.StatusCode == HttpStatusCode.NotFound)
+    //        return null;
+    //    #pragma warning restore CS8603 // Possible null reference return.
+    //    
+    //    response.EnsureSuccessStatusCode();
+    //    var statusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
+    //
+    //    return statusResponse.ToDomainModel();
+    //}
 
-        if (token == null)
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
-        var param = new Dictionary<string, string>
-        {
-            { "vin", vin },
-            { "starttime", startTime.ToString() },
-            { "stoptime", stopTime.ToString() ?? DateTime.UtcNow.ToString() },
-            { "triggerFilter", "TIMER" },
-            { "contentFilter", "SNAPSHOT" },
-            { "datetype", "received" }
-        };
-        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
-
-        Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
-        {
-            { "Authorization", "Bearer " + token },
-            { "accept", "application/json; rfms=vehiclestatuses.v4.0" }
-        };
-        var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
-
-        #pragma warning disable CS8603 // Possible null reference return.
-        var response = await client.SendAsync(request);
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            return null;
-        #pragma warning restore CS8603 // Possible null reference return.
-        
-        response.EnsureSuccessStatusCode();
-        var statusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
-
-        return statusResponse.ToDomainModel();
-    }
-    
-    private async Task<string> AuthScania(Tenant tenant)
-    {
-        //Build api request
-        var uri = ClientHelpers.BuildUri("https://dataaccess.scania.com", "auth/clientid2challenge", $"");
-        var request = new HttpRequestMessage(HttpMethod.Post, uri.Uri);
-
-        request.Content = new StringContent("clientId=" + tenant.ScaniaClientId, null, "application/x-www-form-urlencoded");
-        //Make api request and validate response code
-        var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        //Parse response
-        var challenge = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
-
-        var secretKey = tenant.ScaniaSecretKey ?? string.Empty;
-
-        if (secretKey == string.Empty)
-            throw new Exception("No secret key found");
-
-        var sharedKeyArr = Base64Url.Decode(secretKey);
-        var challengeArr = Base64Url.Decode(challenge.FirstOrDefault().Value);
-        byte[]? challengeResponse = null;
-        using (HMACSHA256 hmac = new HMACSHA256(sharedKeyArr))
-        {
-            challengeResponse = hmac.ComputeHash(challengeArr);
-        }
-        var encodedResponse = EncodeChallengeResponse(challengeResponse);
-
-        uri = ClientHelpers.BuildUri("https://dataaccess.scania.com", "auth/response2token");
-
-        request = new HttpRequestMessage(HttpMethod.Post, uri.Uri);
-        var content = new StringContent("clientId=" + tenant.ScaniaClientId + "&Response=" + encodedResponse, null, "application/x-www-form-urlencoded");
-        request.Content = content;
-        response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var token = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
-
-        return token["token"];
-    }
-
-    private string EncodeChallengeResponse(byte[] challengeResponse)
-    {
-        return Base64Url.Encode(challengeResponse);
-    }
-
-    public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         token ??= await AuthScania(tenant);
 
@@ -220,6 +174,54 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         return scaniaVehicleStatusResponse.ToIntervalDomainModel();
     }
+
+    private async Task<string> AuthScania(Tenant tenant)
+    {
+        //Build api request
+        var uri = ClientHelpers.BuildUri("https://dataaccess.scania.com", "auth/clientid2challenge", $"");
+        var request = new HttpRequestMessage(HttpMethod.Post, uri.Uri);
+
+        request.Content = new StringContent("clientId=" + tenant.ScaniaClientId, null, "application/x-www-form-urlencoded");
+        //Make api request and validate response code
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        //Parse response
+        var challenge = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
+
+        var secretKey = tenant.ScaniaSecretKey ?? string.Empty;
+
+        if (secretKey == string.Empty)
+            throw new Exception("No secret key found");
+
+        var sharedKeyArr = Base64Url.Decode(secretKey);
+        var challengeArr = Base64Url.Decode(challenge.FirstOrDefault().Value);
+        byte[]? challengeResponse = null;
+        using (HMACSHA256 hmac = new HMACSHA256(sharedKeyArr))
+        {
+            challengeResponse = hmac.ComputeHash(challengeArr);
+        }
+        var encodedResponse = EncodeChallengeResponse(challengeResponse);
+
+        uri = ClientHelpers.BuildUri("https://dataaccess.scania.com", "auth/response2token");
+
+        request = new HttpRequestMessage(HttpMethod.Post, uri.Uri);
+        var content = new StringContent("clientId=" + tenant.ScaniaClientId + "&Response=" + encodedResponse, null, "application/x-www-form-urlencoded");
+        request.Content = content;
+        response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var token = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
+
+        return token["token"];
+    }
+
+    private string EncodeChallengeResponse(byte[] challengeResponse)
+    {
+        return Base64Url.Encode(challengeResponse);
+    }
+
+   
 }
 
 public class Base64Url

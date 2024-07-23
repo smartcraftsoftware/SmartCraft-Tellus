@@ -38,7 +38,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
 
             }
 
-            var vehicles = await vehicleService.GetFleetAsync(vehicleBrand, tenant);
+            var vehicles = await vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
             if (vehicles == null)
                 return NotFound("Could not find vehicle");
 
@@ -53,7 +53,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     }
 
     /// <summary>
-    /// Gets ESG report for a vehicle
+    /// Returns reports for vehicles between two dates, without timestamps.
     /// </summary>
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
     /// <param name="vinOrId">Vin number or external id of vehicle. 
@@ -65,12 +65,12 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/esgreport")]
-    public async Task<ActionResult<EsgReportResponse>> GetEsgReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    [HttpGet("{vehicleBrand}/report")]
+    public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
     {
         try
         {
-            logger.Log(LogLevel.Information, "Getting ESG report for tenant {tenantId}", tenantId);
+            logger.Log(LogLevel.Information, "Getting report for tenant {tenantId}", tenantId);
             var tenant = await tenantService.GetTenantAsync(tenantId);
             if (tenant == null)
             {
@@ -90,13 +90,13 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting ESG report for tenant {tenantId}", tenantId);
+            logger.Log(LogLevel.Error, ex, "Error getting report for tenant {tenantId}", tenantId);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
     /// <summary>
-    /// Gets a summarized environmental status report for a vehicle
+    /// Gets a summarized environmental status report for a vehicle between two timestamps
     /// </summary>
     /// <param name="vehicleBrand">Brand of vehicle to fetch</param>
     /// <param name="vinOrId">Vin number or external id of vehicle.</param>
@@ -107,7 +107,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/statusreport")]
+    [HttpGet("{vehicleBrand}/vehiclestatus")]
     public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, string vinOrId = "")
     {
         try
@@ -125,7 +125,7 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
                 return NotFound("Could not find tenant");
             }
 
-            var statusReport = await vehicleService.GetIntervalVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var statusReport = await vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
             return Ok(statusReport.ToIntervalRespone());
         }
         catch (HttpRequestException ex)

@@ -178,11 +178,11 @@ paths:
           description: Could not find vehicle
         '500':
           description: Internal server error
-  '/api/v{version}/Vehicles/{vehicleBrand}/esgreport':
+  '/api/v{version}/Vehicles/{vehicleBrand}/report':
     get:
       tags:
         - Vehicles
-      summary: Gets ESG report for a vehicle
+      summary: 'Returns reports for vehicles between two dates, without timestamps.'
       parameters:
         - name: vehicleBrand
           in: path
@@ -224,16 +224,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EsgReportResponse'
+                $ref: '#/components/schemas/VehicleEvaluationReportResponse'
         '404':
           description: Could not find vehicle
         '500':
           description: Internal server error
-  '/api/v{version}/Vehicles/{vehicleBrand}/statusreport':
+  '/api/v{version}/Vehicles/{vehicleBrand}/vehiclestatus':
     get:
       tags:
         - Vehicles
-      summary: Gets a summarized environmental status report for a vehicle
+      summary: Gets a summarized environmental status report for a vehicle between two timestamps
       parameters:
         - name: vehicleBrand
           in: path
@@ -300,24 +300,6 @@ components:
           nullable: true
         daimlerToken:
           type: string
-          nullable: true
-      additionalProperties: false
-    EsgReportResponse:
-      required:
-        - vehicleEvaluations
-      type: object
-      properties:
-        startTime:
-          type: string
-          format: date-time
-        stopTime:
-          type: string
-          format: date-time
-          nullable: true
-        vehicleEvaluations:
-          type: array
-          items:
-            $ref: '#/components/schemas/VehicleEvaluationResponse'
           nullable: true
       additionalProperties: false
     GetTenantResponse:
@@ -459,6 +441,24 @@ components:
           nullable: true
         daimlerToken:
           type: string
+          nullable: true
+      additionalProperties: false
+    VehicleEvaluationReportResponse:
+      required:
+        - vehicleEvaluations
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        stopTime:
+          type: string
+          format: date-time
+          nullable: true
+        vehicleEvaluations:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleEvaluationResponse'
           nullable: true
       additionalProperties: false
     VehicleEvaluationResponse:

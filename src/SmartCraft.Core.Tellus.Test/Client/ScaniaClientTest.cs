@@ -337,7 +337,7 @@ public class ScaniaClientTest
 
         //Assert
         result.Should().NotBeNull().
-            And.BeOfType<StatusReport>().
+            And.BeOfType<IntervalStatusReport>().
             Which.Vin.Should().Be("thisisavin");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync", 

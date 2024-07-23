@@ -25,17 +25,17 @@ public class VehiclesService : IVehiclesService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime)
-    {
-        (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
+    //public async Task<Domain.Models.StatusReport> GetVehicleStatusAsync(string vehicleBrand, string vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime)
+    //{
+    //    (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
+    //
+    //    if (!MatchKeyvalue(vehicleBrand))
+    //        throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
+    //
+    //    return await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vinNumber, tenant, start, stop);
+    //}
 
-        if (!MatchKeyvalue(vehicleBrand))
-            throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
-
-        return await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vinNumber, tenant, start, stop);
-    }
-
-    public async Task<List<Vehicle>> GetFleetAsync(string vehicleBrand, Tenant tenant)
+    public async Task<List<Vehicle>> GetVehiclesAsync(string vehicleBrand, Tenant tenant)
     {
         if (!MatchKeyvalue(vehicleBrand.ToLower()))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
@@ -44,14 +44,14 @@ public class VehiclesService : IVehiclesService
         return vehicles;
     }
 
-    public async Task<IntervalStatusReport> GetIntervalVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
         if (!MatchKeyvalue(vehicleBrand))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
-        var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetIntervalStatusReportAsync(vin, tenant, start, stop);
+        var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vin, tenant, start, stop);
 
         await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
 

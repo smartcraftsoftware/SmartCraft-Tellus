@@ -34,7 +34,7 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
         var existingTenant = await repository.Get(id);
         if (existingTenant == null)
         {
-            throw new NullReferenceException("Tenant not found");
+            throw new InvalidOperationException("Tenant not found");
         }
 
         if (tenant.DaimlerToken != null)

@@ -2,6 +2,7 @@
 using SmartCraft.Core.Tellus.Domain.Utility;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
+using System;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -161,9 +162,63 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return Base64Url.Encode(challengeResponse);
     }
 
-    public Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetIntervalStatusReportAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
-        throw new NotImplementedException();
+        token ??= await AuthScania(tenant);
+
+        if (token == null)
+            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+
+        var param = new Dictionary<string, string>
+        {
+            { "vin", vin },
+            { "starttime", startTime.ToIso8601() },
+            { "stoptime", stopTime.ToIso8601() },
+            { "triggerFilter", "TIMER" },
+            { "contentFilter", "SNAPSHOT" },
+            { "datetype", "received" }
+        };
+        var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
+
+        Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
+        {
+            { "Authorization", "Bearer " + token },
+            { "accept", "application/json; rfms=vehiclestatuses.v4.0" }
+        };
+        var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+
+
+#pragma warning disable CS8603 // Possible null reference return.
+        var response = await client.SendAsync(request);
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            throw new HttpRequestException("Volvo: could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+#pragma warning restore CS8603 // Possible null reference return.
+
+        response.EnsureSuccessStatusCode();
+        string responseContent = await response.Content.ReadAsStringAsync();
+        var scaniaVehicleStatusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+        if (scaniaVehicleStatusResponse.MoreDataAvailable && scaniaVehicleStatusResponse?.VehicleStatusResponse?.VehicleStatuses?.Length > 0)
+        {
+            bool moreDataAvailable = true;
+            while (moreDataAvailable)
+            {
+                var latest = scaniaVehicleStatusResponse.VehicleStatusResponse.VehicleStatuses[^1];
+#pragma warning disable CS8629 // Nullable value type may be null.
+                DateTime latestDate = (DateTime)latest.ReceivedDateTime;
+#pragma warning restore CS8629 // Nullable value type may be null.
+                latestDate = latestDate.AddSeconds(1);
+                param["starttime"] = latestDate.ToIso8601();
+                uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", param);
+                request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
+                response = await client.SendAsync(request);
+                responseContent = await response.Content.ReadAsStringAsync();
+                var newVehicleStatusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+                scaniaVehicleStatusResponse.VehicleStatusResponse.VehicleStatuses = scaniaVehicleStatusResponse.VehicleStatusResponse.VehicleStatuses.Concat(newVehicleStatusResponse.VehicleStatusResponse.VehicleStatuses).ToArray();
+                moreDataAvailable = newVehicleStatusResponse.MoreDataAvailable;
+            }
+        }
+
+        return scaniaVehicleStatusResponse.ToIntervalDomainModel();
     }
 }
 

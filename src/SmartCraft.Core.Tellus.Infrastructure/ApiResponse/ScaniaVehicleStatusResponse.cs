@@ -1,16 +1,17 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
-public class VehicleStatusApiResponse
-{
-    [JsonPropertyName("vehicleStatusResponse")]
-    public ScaniaVehicleStatusResponse? VehicleStatusResponse { get; set; }
-}
-
 public class ScaniaVehicleStatusResponse
 {
+    public bool MoreDataAvailable { get; set; }
+    [JsonPropertyName("vehicleStatusResponse")]
+    public ScaniaVehicleStatus VehicleStatusResponse { get; set; } = new();
+}
+
+public class ScaniaVehicleStatus
+{
     [JsonPropertyName("vehicleStatuses")]
-    public VehicleStatus[]? VehicleStatuses { get; set; }
+    public VehicleStatus[] VehicleStatuses { get; set; } = [];
 }
 
 public class VehicleStatus
@@ -19,10 +20,10 @@ public class VehicleStatus
     public string? Vin { get; set; }
 
     [JsonPropertyName("createdDateTime")]
-    public string? CreatedDateTime { get; set; }
+    public DateTime? CreatedDateTime { get; set; }
 
     [JsonPropertyName("receivedDateTime")]
-    public string? ReceivedDateTime { get; set; }
+    public DateTime? ReceivedDateTime { get; set; }
 
     [JsonPropertyName("hrTotalVehicleDistance")]
     public int? HrTotalVehicleDistance { get; set; }
@@ -33,6 +34,13 @@ public class VehicleStatus
     [JsonPropertyName("totalElectricMotorHours")]
     public double? TotalElectricMotorHours { get; set; }
 
+    [JsonPropertyName("totalFuelUsedGaseous")]
+    public double? TotalGaseousFuelUsed { get; set; }
+    public double? TotalElectricEnergyUsed { get; set; }
+
     [JsonPropertyName("engineTotalFuelUsed")]
     public int? EngineTotalFuelUsed { get; set; }
+    public AccumulatedData? AccumulatedData { get; set; }
+    public SnapShotData? SnapShotData { get; set; }
+
 }

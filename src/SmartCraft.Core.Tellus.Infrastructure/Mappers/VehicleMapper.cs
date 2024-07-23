@@ -78,19 +78,69 @@ public static class VehicleMapper
 
     public static StatusReport ToDomainModel(this ScaniaVehicleStatusResponse statusResponse)
     {
-        DateTime createdTime;
-        DateTime.TryParse(statusResponse.VehicleStatuses?[0].CreatedDateTime, out createdTime);
-        DateTime receivedTime;
-        DateTime.TryParse(statusResponse.VehicleStatuses?[0].ReceivedDateTime, out receivedTime);
+
         return new StatusReport
         {
-            Vin = statusResponse.VehicleStatuses?[0].Vin,
-            CreatedDateTime = createdTime,
-            ReceivedDateTime = receivedTime,
-            HrTotalVehicleDistance = statusResponse.VehicleStatuses?[0].HrTotalVehicleDistance,
-            TotalEngineHours = statusResponse.VehicleStatuses?[0].TotalEngineHours,
-            TotalElectricMotorHours = statusResponse.VehicleStatuses?[0].TotalElectricMotorHours,
-            EngineTotalFuelUsed = statusResponse.VehicleStatuses?[0].EngineTotalFuelUsed,
+            Vin = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].Vin,
+            CreatedDateTime = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].CreatedDateTime,
+            ReceivedDateTime = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].ReceivedDateTime,
+            HrTotalVehicleDistance = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].HrTotalVehicleDistance,
+            TotalEngineHours = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].TotalEngineHours,
+            TotalElectricMotorHours = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].TotalElectricMotorHours,
+            EngineTotalFuelUsed = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].EngineTotalFuelUsed,
+        };
+    }
+
+    public static IntervalStatusReport ToIntervalDomainModel(this ScaniaVehicleStatusResponse statusResponse)
+    {
+        // sort statusResponse VehicleStatus by received date, just in case
+        var vehicleStatuses = statusResponse?.VehicleStatusResponse.VehicleStatuses.OrderBy(x => x.CreatedDateTime).ToArray();
+        if (vehicleStatuses?.Length == 0)
+            throw new InvalidOperationException("Statusresponse is empty");
+
+        var vin = vehicleStatuses?[0].Vin ?? string.Empty;
+
+        var first = vehicleStatuses?[0];
+        var last = vehicleStatuses?[^1];
+
+        DateTime firstDate = first?.CreatedDateTime ?? throw new InvalidOperationException();
+        DateTime lastDate = last?.CreatedDateTime ?? throw new InvalidOperationException();
+
+        var firstTotalFuelUsed = first?.EngineTotalFuelUsed;
+        var lastTotalFuelUsed = last?.EngineTotalFuelUsed;
+        var totalFuelUsed = lastTotalFuelUsed - firstTotalFuelUsed;
+
+        var firstHrTotalVehicleDistance = first?.HrTotalVehicleDistance;
+        var lastHrTotalVehicleDistance = last?.HrTotalVehicleDistance;
+        var totalHrTotalVehicleDistance = lastHrTotalVehicleDistance - firstHrTotalVehicleDistance;
+
+        var firstTotalEngineHours = first?.TotalEngineHours;
+        var lastTotalEngineHours = last?.TotalEngineHours;
+        var totalEngineHours = lastTotalEngineHours - firstTotalEngineHours;
+
+        var firstTotalElectricMotorHours = first?.TotalElectricMotorHours;
+        var lastTotalElectricMotorHours = last?.TotalElectricMotorHours;
+        var totalElectricMotorHours = lastTotalElectricMotorHours - firstTotalElectricMotorHours;
+
+        var firstTotalGaseousFuelUsed = first?.TotalGaseousFuelUsed;
+        var lastTotalGaseousFuelUsed = last?.TotalGaseousFuelUsed;
+        var totalGaseousFuelUsed = lastTotalGaseousFuelUsed - firstTotalGaseousFuelUsed;
+
+        var firstTotalElectricEnergyUsed = first?.TotalElectricEnergyUsed;
+        var lastTotalElectricEnergyUsed = last?.TotalElectricEnergyUsed;
+        var totalElectricEnergyUsed = lastTotalElectricEnergyUsed - firstTotalElectricEnergyUsed;
+
+        return new IntervalStatusReport
+        {
+            Vin = vin,
+            StartDateTime = firstDate.ToUniversalTime(),
+            EndDateTime = lastDate.ToUniversalTime(),
+            EngineTotalFuelUsed = totalFuelUsed,
+            HrTotalVehicleDistance = totalHrTotalVehicleDistance,
+            TotalEngineHours = totalEngineHours,
+            TotalElectricMotorHours = totalElectricMotorHours,
+            TotalGaseousFuelUsed = totalGaseousFuelUsed,
+            TotalElectricEnergyUsed = totalElectricEnergyUsed
         };
     }
 
@@ -135,14 +185,16 @@ public static class VehicleMapper
     {
         // sort statusResponse VehicleStatus by received date, just in case
         var vehicleStatuses = statusResponse?.VehicleStatus?.OrderBy(x => x.CreatedDateTime).ToArray();
+        if (vehicleStatuses?.Length == 0)
+            throw new InvalidOperationException("Statusresponse is empty");
 
         var vin = vehicleStatuses?[0].Vin ?? string.Empty;
 
         var first = vehicleStatuses?[0];
         var last = vehicleStatuses?[^1];
 
-        var firstDate = first?.CreatedDateTime;
-        var lastDate = last?.CreatedDateTime;
+        DateTime firstDate = first?.CreatedDateTime ?? throw new InvalidOperationException();
+        DateTime lastDate = last?.CreatedDateTime ?? throw new InvalidOperationException();
 
         var firstTotalFuelUsed = first?.EngineTotalFuelUsed;
         var lastTotalFuelUsed = last?.EngineTotalFuelUsed;
@@ -171,8 +223,8 @@ public static class VehicleMapper
         return new IntervalStatusReport
         {
             Vin = vin,
-            StartDateTime = firstDate,
-            EndDateTime = lastDate,
+            StartDateTime = firstDate.ToUniversalTime(),
+            EndDateTime = lastDate.ToUniversalTime(),
             EngineTotalFuelUsed = totalFuelUsed,
             HrTotalVehicleDistance = totalHrTotalVehicleDistance,
             TotalEngineHours = totalEngineHours,

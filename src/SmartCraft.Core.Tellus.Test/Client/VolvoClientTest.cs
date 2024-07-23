@@ -215,15 +215,15 @@ public class VolvoClientTest
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new ScaniaVehicleStatusResponse
+                Content = new StringContent(JsonSerializer.Serialize(new VolvoVehicleStatusResponse
                 {
-                    VehicleStatuses = new VehicleStatus[]
-            {
-                new VehicleStatus
-                {
-                    Vin = "thisisavin"
-                }
-            }
+                    VehicleStatus =
+                    [
+                        new VolvoVehicleStatus
+                        {
+                            Vin = "thisisavin"
+                        }
+                    ]
                 }))
             });
 
@@ -262,15 +262,15 @@ public class VolvoClientTest
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = statusCode,
-                Content = new StringContent(JsonSerializer.Serialize(new ScaniaVehicleStatusResponse
+                Content = new StringContent(JsonSerializer.Serialize(new VolvoVehicleStatusResponse
                 {
-                    VehicleStatuses = new VehicleStatus[]
-                    {
-                        new VehicleStatus
+                    VehicleStatus =
+                    [
+                        new VolvoVehicleStatus
                         {
                             Vin = "thisisavin"
                         }
-                    }
+                    ]
                 }))
             });
 

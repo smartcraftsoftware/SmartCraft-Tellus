@@ -48,7 +48,7 @@ public class TenantServiceTest
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(null as Infrastructure.Models.Tenant);
 
         //Act and Assert
-        Task<NullReferenceException> exc = Assert.ThrowsAsync<NullReferenceException>(async () => await service.GetTenantAsync(Guid.NewGuid()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetTenantAsync(Guid.NewGuid()));
     }
 
     [Fact]
@@ -120,10 +120,10 @@ public class TenantServiceTest
     {
         //Arrange
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Infrastructure.Models.Tenant?)null);
-        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ThrowsAsync(new NullReferenceException());
+        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
 
         //Act and Assert
-        Task<NullReferenceException> exc = Assert.ThrowsAsync<NullReferenceException>(async () => await service.UpdateTenantAsync(Guid.NewGuid(), new Domain.Models.Tenant()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateTenantAsync(Guid.NewGuid(), new Domain.Models.Tenant()));
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()), Times.Never);
     }

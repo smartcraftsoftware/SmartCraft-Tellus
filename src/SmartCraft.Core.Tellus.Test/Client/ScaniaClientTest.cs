@@ -315,15 +315,17 @@ public class ScaniaClientTest
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(new ScaniaVehicleStatusResponse
                 {
-                    VehicleStatuses =
-                    [
-                        new VehicleStatus
-                        {
-                            Vin = "thisisavin",
-                            CreatedDateTime = "DateTime.UtcNow",
-                            
-                        }
-                    ]
+                    VehicleStatusResponse = new ScaniaVehicleStatus
+                    {
+                        VehicleStatuses =
+                        [
+                            new VehicleStatus
+                            {
+                                Vin = "thisisavin",
+                                CreatedDateTime = DateTime.UtcNow
+                            }
+                        ]
+                    }
                 }))
             });
         
@@ -393,13 +395,17 @@ public class ScaniaClientTest
                 StatusCode = statusCode,
                 Content = new StringContent(JsonSerializer.Serialize(new ScaniaVehicleStatusResponse
                 {
-                    VehicleStatuses = new VehicleStatus[]
-            {
-                new VehicleStatus
-                {
-                    Vin = "thisisavin"
-                }
-            }
+                    VehicleStatusResponse = new ScaniaVehicleStatus
+                    {
+                        VehicleStatuses =
+                        [
+                            new VehicleStatus
+                            {
+                                Vin = "thisisavin"
+                            }
+                        ]
+                    }
+        
                 }))
             });
 
@@ -465,13 +471,18 @@ public class ScaniaClientTest
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(new ScaniaVehicleStatusResponse
                 {
-                    VehicleStatuses = new VehicleStatus[]
-            {
-                new VehicleStatus
-                {
-                    Vin = "thisisavin"
-                }
-            }
+                    VehicleStatusResponse = new ScaniaVehicleStatus
+                    {
+                        VehicleStatuses =
+                        [
+                            new VehicleStatus
+                            {
+                                Vin = "thisisavin"
+                            }
+                        ]
+                    }
+
+
                 }))
             });
 

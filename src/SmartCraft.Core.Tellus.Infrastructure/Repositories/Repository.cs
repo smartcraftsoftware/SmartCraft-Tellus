@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SmartCraft.Core.Tellus.Domain.Repositories;
 using SmartCraft.Core.Tellus.Infrastructure.Models;
 
@@ -8,11 +9,13 @@ public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> wher
 {
     private readonly DbSet<TEntity> _entities;
     private readonly TContext _context;
+    private readonly ILogger _logger;
  
-    public Repository(TContext context)
+    public Repository(TContext context, ILogger logger)
     {
         _context = context;
         _entities = context.Set<TEntity>();
+        _logger = SetLoggerContext(logger);
     }
     public async Task Add(TEntity entity, Guid tenantId)
     {
@@ -27,16 +30,17 @@ public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> wher
         }
         catch(Exception ex)
         {
+            _logger.Error("Trying to add {Entity} did not succeed with {Message}", entity, ex.Message);
             throw new Exception("Could not add entity", ex);
         }
     } 
 
     public async Task<List<TEntity>> GetAll()
     {
-        return await _entities.ToListAsync();
+            return await _entities.ToListAsync();
     }
 
-    public async Task<TEntity> Get(Guid id)
+    public async Task<TEntity?> Get(Guid id)
     {
         #pragma warning disable CS8603
         return await _entities.FindAsync(id);
@@ -45,21 +49,45 @@ public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> wher
 
     public async Task<TEntity> Update(TEntity entity, Guid tenantId)
     {
-        entity.LastUpdated = DateTime.UtcNow;
-        entity.LastUpdatedBy = tenantId;
-        _context.Update(entity);
-        await _context.SaveChangesAsync();
+        try
+        {
+            entity.LastUpdated = DateTime.UtcNow;
+            entity.LastUpdatedBy = tenantId;
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
 
-        return entity;
+            return entity;
+        }
+        catch (Exception ex) 
+        {
+            _logger.Error("Unable to update {Entity} with {ErrorMessage}", entity, ex.Message);
+            throw new Exception("Could not update entity");
+        }
+
     }
 
     public async Task<bool> Delete(Guid id)
     {
-        var entity = await _entities.FindAsync(id);
-        if(entity == null)
-            return false;
+        try
+        {
+            var entity = await _entities.FindAsync(id);
+            if (entity == null)
+                return false;
 
-        _entities.Remove(entity);
-        return await _context.SaveChangesAsync() > 0;
+            _entities.Remove(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        catch (Exception ex) 
+        {
+            _logger.Error("Could not delete Entity with {Id} with {ErrorMessage}", id, ex.Message);
+        }
+
+        return false;
     }
+
+    private ILogger SetLoggerContext(ILogger logger)
+    {
+        return logger.ForContext(typeof(Repository<,>));
+    }
+
 }

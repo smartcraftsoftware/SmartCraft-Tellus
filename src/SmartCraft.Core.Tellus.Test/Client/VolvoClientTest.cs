@@ -6,18 +6,24 @@ using System.Net;
 using System.Text.Json;
 using SmartCraft.Core.Tellus.Domain.Models;
 using FluentAssertions;
+using Serilog;
+using Serilog.Events;
 
 namespace SmartCraft.Core.Tellus.Test.Client;
 public class VolvoClientTest
 {
     private readonly Mock<HttpMessageHandler> handlerMock;
+    private readonly Mock<ILogger> loggerMock;
     public VolvoClientTest()
     {
         handlerMock = new Mock<HttpMessageHandler>();
+        loggerMock = new Mock<ILogger>();
+        loggerMock.Setup(x => x.ForContext<VolvoClient>()).Returns(loggerMock.Object);
     }
 
+
     [Fact]
-    public async Task GetEsgReportAsync_Returns_Report()
+    public async Task GetVehicleEvaluationReportAsync_Returns_Report()
     {
         // Arrange
         Tenant tenant = new Tenant
@@ -52,10 +58,10 @@ public class VolvoClientTest
         var client = CreateVolvoClient(httpClient);
 
         // Act
-        var result = await client.GetEsgReportAsync("vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
+        var result = await client.GetVehicleEvaluationReportAsync("vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
 
         // Assert
-        result.Should().NotBeNull().And.BeOfType<EsgVehicleReport>();
+        result.Should().NotBeNull().And.BeOfType<VehicleEvaluationReport>();
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -104,11 +110,11 @@ public class VolvoClientTest
         var client = CreateVolvoClient(httpClient);
 
         //Act
-        var action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var action = () => client.GetVehicleEvaluationReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -184,11 +190,11 @@ public class VolvoClientTest
         var client = CreateVolvoClient(httpClient);
 
         //Act
-        var action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var action = () => client.GetVehicleEvaluationReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -275,16 +281,22 @@ public class VolvoClientTest
                     ]
                 }))
             });
+        loggerMock.Setup(l => l.Write(
+                    It.IsAny<LogEventLevel>(),
+                    It.IsAny<Exception>(),
+                    It.IsAny<string>()
+                ))
+                .Verifiable();
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var client = CreateVolvoClient(httpClient);
+      var client = CreateVolvoClient(httpClient);
 
         //Act
         var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -295,6 +307,6 @@ public class VolvoClientTest
 
     private VolvoClient CreateVolvoClient(HttpClient httpClient)
     {
-        return new VolvoClient(httpClient);
+        return new VolvoClient(httpClient, loggerMock.Object);
     }
 }

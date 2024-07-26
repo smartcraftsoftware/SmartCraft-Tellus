@@ -1,4 +1,5 @@
-﻿using SmartCraft.Core.Tellus.Domain.Models;
+﻿using Serilog;
+using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Repositories;
 using SmartCraft.Core.Tellus.Domain.Services;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
@@ -8,6 +9,7 @@ namespace SmartCraft.Core.Tellus.Application.Services;
 
 public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantContext> repository) : ITenantService
 {
+   
     public async Task<Tenant?> GetTenantAsync(Guid id)
     {
         var tenant = await repository.Get(id);
@@ -57,5 +59,7 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
     {
        return await repository.Delete(id);
     }
+
+
 }
 

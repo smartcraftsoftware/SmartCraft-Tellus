@@ -81,20 +81,20 @@ public static class VehicleMapper
 
         return new StatusReport
         {
-            Vin = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].Vin,
-            CreatedDateTime = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].CreatedDateTime,
-            ReceivedDateTime = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].ReceivedDateTime,
-            HrTotalVehicleDistance = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].HrTotalVehicleDistance,
-            TotalEngineHours = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].TotalEngineHours,
-            TotalElectricMotorHours = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].TotalElectricMotorHours,
-            EngineTotalFuelUsed = statusResponse.VehicleStatusResponse.VehicleStatuses?[0].EngineTotalFuelUsed,
+            Vin = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].Vin,
+            CreatedDateTime = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].CreatedDateTime,
+            ReceivedDateTime = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].ReceivedDateTime,
+            HrTotalVehicleDistance = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].HrTotalVehicleDistance,
+            TotalEngineHours = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].TotalEngineHours,
+            TotalElectricMotorHours = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].TotalElectricMotorHours,
+            EngineTotalFuelUsed = statusResponse?.VehicleStatusResponse?.VehicleStatuses?[0].EngineTotalFuelUsed,
         };
     }
 
     public static IntervalStatusReport ToIntervalDomainModel(this ScaniaVehicleStatusResponse statusResponse)
     {
         // sort statusResponse VehicleStatus by received date, just in case
-        var vehicleStatuses = statusResponse?.VehicleStatusResponse.VehicleStatuses.OrderBy(x => x.CreatedDateTime).ToArray();
+        var vehicleStatuses = statusResponse?.VehicleStatusResponse?.VehicleStatuses.OrderBy(x => x.CreatedDateTime).ToArray();
         if (vehicleStatuses?.Length == 0)
             throw new InvalidOperationException("Statusresponse is empty");
 

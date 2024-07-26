@@ -6,7 +6,7 @@ public interface IRepository<TEntity, TContext> where TEntity : class where TCon
 {
     Task Add(TEntity entity, Guid tenantId);
     Task<List<TEntity>> GetAll();
-    Task<TEntity> Get(Guid id);
+    Task<TEntity?> Get(Guid id);
     Task<TEntity> Update(TEntity entity, Guid tenantId);
     Task<bool> Delete(Guid id);
 }

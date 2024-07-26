@@ -37,7 +37,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swaggerGenOptions =>
 {
-    swaggerGenOptions.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo 
     { 
         Title = "SmartCraft Tellus API", 
         Version = "v1",
@@ -95,19 +95,22 @@ builder.Services.AddScoped<IVehicleClient, ManClient>();
 
 //Services
 builder.Services.AddScoped<IVehiclesService, VehiclesService>();
-builder.Services.AddScoped<IEsgService, EsgService>();
+builder.Services.AddScoped<IVehicleEvaluationService, VehicleEvaluationService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 
 //Validators
-builder.Services.AddScoped<EsgReportValidator>();
+builder.Services.AddScoped<VehicleEvaluationReportValidator>();
 
 
 //Context
 builder.Services.AddScoped<TenantContext>();
 builder.Services.AddScoped<VehicleContext>();
 
+//Logger
+builder.Services.AddSingleton(Log.Logger);
+
 //Repositories
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>>();
+builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.VehicleEvaluationReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.VehicleEvaluationReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>>();
@@ -116,16 +119,16 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var vehicleContext = scope.ServiceProvider
-        .GetRequiredService<VehicleContext>();
-    var tenantContext = scope.ServiceProvider
-        .GetRequiredService<TenantContext>();
-
-    vehicleContext.Database.Migrate();
-    tenantContext.Database.Migrate();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var vehicleContext = scope.ServiceProvider
+//        .GetRequiredService<VehicleContext>();
+//    var tenantContext = scope.ServiceProvider
+//        .GetRequiredService<TenantContext>();
+//
+//    vehicleContext.Database.Migrate();
+//    tenantContext.Database.Migrate();
+//}
 
 
 // Configure the HTTP request pipeline.

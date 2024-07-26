@@ -10,7 +10,7 @@ namespace SmartCraft.Core.Tellus.Test.Service;
 public class EsgServiceTest
 {
     private readonly Mock<IVehicleClient> vehicleClientMock = new();
-    private readonly Mock<IRepository<Infrastructure.Models.EsgVehicleReport, VehicleContext>> vehiclesRepositoryMock = new();
+    private readonly Mock<IRepository<Infrastructure.Models.VehicleEvaluationReport, VehicleContext>> vehiclesRepositoryMock = new();
 
     [Theory]
     [InlineData("scania")]
@@ -23,16 +23,16 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .ReturnsAsync(new EsgVehicleReport() { StartTime = DateTime.UtcNow.AddDays(-3), StopTime = DateTime.UtcNow,  VehicleEvaluations = [] });
+        vehicleClientMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                  .ReturnsAsync(new VehicleEvaluationReport() { StartTime = DateTime.UtcNow.AddDays(-3), StopTime = DateTime.UtcNow,  VehicleEvaluations = [] });
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
+        var result = await esgService.GetVehicleEvaluationReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
 
         //Assert
         result.Should().NotBeNull()
-           .And.Subject.As<EsgVehicleReport>()
+           .And.Subject.As<VehicleEvaluationReport>()
            .VehicleEvaluations.Should().BeEmpty();
     }
 
@@ -56,17 +56,17 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .ReturnsAsync(new EsgVehicleReport() { VehicleEvaluations = [] });
+        vehicleClientMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                  .ReturnsAsync(new VehicleEvaluationReport() { VehicleEvaluations = [] });
 
         var esgService = CreateService();
 
         //Act
-        Func<Task> act = async () => await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, startTime, stopTime);
+        Func<Task> act = async () => await esgService.GetVehicleEvaluationReportAsync(vehicleBrand, "vin", tenant, startTime, stopTime);
 
         //Assert
         var exception = await act.Should().ThrowAsync<InvalidOperationException>();
-        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        vehicleClientMock.Verify(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
 
     }
 
@@ -81,21 +81,21 @@ public class EsgServiceTest
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .ReturnsAsync(null as EsgVehicleReport);
+        vehicleClientMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                  .ReturnsAsync(null as VehicleEvaluationReport);
 
         var esgService = CreateService();
 
         //Act
-        var result = await esgService.GetEsgReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
+        var result = await esgService.GetVehicleEvaluationReportAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
 
         //Assert
         result.Should().BeNull();
 
     }
 
-    private EsgService CreateService()
+    private VehicleEvaluationService CreateService()
     {
-        return new EsgService(vehiclesRepositoryMock.Object, new List<IVehicleClient> { vehicleClientMock.Object });
+        return new VehicleEvaluationService(vehiclesRepositoryMock.Object, new List<IVehicleClient> { vehicleClientMock.Object });
     }
 }

@@ -249,13 +249,13 @@ paths:
             format: date-time
         - name: stopTime
           in: query
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: date-time
         - name: tenantId
           in: header
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: uuid

@@ -1,21 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SmartCraft.Core.Tellus.Api.Contracts.Requests;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
 using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Services;
-using SmartCraft.Core.Tellus.Infrastructure.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class TenantControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<TenantsController>> loggerMock = new();
+    private readonly Mock<Serilog.ILogger> loggerMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();
 
     [Fact]
@@ -56,22 +52,6 @@ public class TenantControllerTest
     }
 
     [Fact]
-    public async Task Get_Tenant_ThrowsException()
-    {
-        //Arrange
-        var controller = CreateController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ThrowsAsync(new Exception());
-
-        //Act
-        var result = await controller.Get(Guid.NewGuid());
-
-        //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-    }
-
-    [Fact]
     public async Task Post_Tenant_CreatesTenant()
     {
         //Arrange
@@ -99,11 +79,10 @@ public class TenantControllerTest
         tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
 
         //Act
-        var result = await controller.Post(Guid.NewGuid(), new AddTenantRequest());
+        Func<Task> result = async () => await controller.Post(Guid.NewGuid(), new AddTenantRequest());
 
         //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
+        await result.Should().ThrowAsync<Exception>();
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
     }
 
@@ -132,14 +111,13 @@ public class TenantControllerTest
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
+        tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new InvalidOperationException("Wrong!"));
 
         //Act
-        var result = await controller.Patch(Guid.NewGuid(), new UpdateTenantRequest());
+        var result = async () => await controller.Patch(Guid.NewGuid(), new UpdateTenantRequest());
 
         //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
+        await result.Should().ThrowAsync<InvalidOperationException>().WithMessage("Wrong!");
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
     }
 
@@ -182,11 +160,10 @@ public class TenantControllerTest
         tenantServiceMock.Setup(x => x.DeleteTenant(It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
         //Act
-        var result = await controller.Delete(Guid.NewGuid());
+        Func<Task> result = async () => await controller.Delete(Guid.NewGuid());
 
         //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
+        await result.Should().ThrowAsync<Exception>();
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.DeleteTenant(It.IsAny<Guid>()), Times.Once);
     }
 

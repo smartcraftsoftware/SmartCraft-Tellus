@@ -4,16 +4,16 @@ using SmartCraft.Core.Tellus.Domain.Validators;
 namespace SmartCraft.Core.Tellus.Test.Validators;
 public class EsgReportValidatorTest
 {
-    private readonly EsgReportValidator _esgReportValidator;
+    private readonly VehicleEvaluationReportValidator _esgReportValidator;
     public EsgReportValidatorTest()
     {
-        _esgReportValidator = new EsgReportValidator();
+        _esgReportValidator = new VehicleEvaluationReportValidator();
     }
-    public static TheoryData<List<EsgVehicleReport>> EsgReportCases = new TheoryData<List<EsgVehicleReport>>
+    public static TheoryData<List<VehicleEvaluationReport>> EsgReportCases = new TheoryData<List<VehicleEvaluationReport>>
     {
-        new List<EsgVehicleReport>
+        new List<VehicleEvaluationReport>
         {
-            new EsgVehicleReport
+            new VehicleEvaluationReport
             {
                 Id = Guid.NewGuid(),
                 StartTime = DateTime.UtcNow.AddDays(-3),
@@ -50,7 +50,7 @@ public class EsgReportValidatorTest
                     }
                 }
             },
-            new EsgVehicleReport
+            new VehicleEvaluationReport
             {
                 Id = Guid.NewGuid(),
                 StartTime = DateTime.UtcNow.AddMonths(-3),
@@ -62,7 +62,7 @@ public class EsgReportValidatorTest
     };
 
     [Theory, MemberData(nameof(EsgReportCases))]
-    public void CreateEsgReport_ShouldPass(List<EsgVehicleReport> esgVehicleReports)
+    public void CreateEsgReport_ShouldPass(List<VehicleEvaluationReport> esgVehicleReports)
     {       
         foreach(var vehicleReport in esgVehicleReports)
         {
@@ -84,7 +84,7 @@ public class EsgReportValidatorTest
     public void CreateEsgReport_InvalidEngineRunningTime_ShouldFail(string engineRunningTime)
     {
         //Arrange
-        var report = new EsgVehicleReport
+        var report = new VehicleEvaluationReport
         {
             Id = Guid.NewGuid(),
             StartTime = DateTime.UtcNow.AddDays(-3),

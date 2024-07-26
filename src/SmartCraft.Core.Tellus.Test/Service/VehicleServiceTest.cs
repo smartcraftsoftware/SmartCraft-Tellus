@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Serilog;
 using SmartCraft.Core.Tellus.Application.Services;
 using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Repositories;
@@ -13,6 +14,7 @@ public class VehicleServiceTest
     private readonly Mock<IVehicleClient> _vehicleClientMock;
     private readonly Mock<IRepository<Infrastructure.Models.Vehicle, VehicleContext>> _vehiclesRepositoryMock;
     private readonly Mock<IRepository<Infrastructure.Models.IntervalStatusReport, VehicleContext>> _statusRepositoryMock;
+    private readonly Mock<ILogger> loggerMock = new Mock<ILogger>();
     public VehicleServiceTest()
     {
         _vehicleClientMock = new Mock<IVehicleClient>();
@@ -34,7 +36,7 @@ public class VehicleServiceTest
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
           .ReturnsAsync(new IntervalStatusReport() { Vin = vin });
-        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
+        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object }, loggerMock.Object);
 
         // Act
         var result = await _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow);
@@ -56,7 +58,7 @@ public class VehicleServiceTest
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException());
-        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
+        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object }, loggerMock.Object);
        
         // Assert and Act
         Task<HttpRequestException> task = Assert.ThrowsAsync<HttpRequestException>(() => _vehiclesService.GetVehicleStatusAsync(vehicleBrand, "vin", tenant, DateTime.UtcNow, DateTime.UtcNow));
@@ -74,7 +76,7 @@ public class VehicleServiceTest
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new JsonException());
-        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
+        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object }, loggerMock.Object);
 
 
         // Assert
@@ -95,7 +97,7 @@ public class VehicleServiceTest
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehiclesAsync(It.IsAny<Tenant>()))
                   .ReturnsAsync([new() { Vin = "thisisvin" }]);
-        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
+        VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object }, loggerMock.Object);
 
 
         // Act

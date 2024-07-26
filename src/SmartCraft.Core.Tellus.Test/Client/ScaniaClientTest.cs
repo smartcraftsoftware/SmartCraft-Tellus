@@ -6,14 +6,23 @@ using SmartCraft.Core.Tellus.Domain.Models;
 using Moq.Protected;
 using System.Text.Json;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
+using Serilog;
 
 namespace SmartCraft.Core.Tellus.Test.Client;
 public class ScaniaClientTest
 {
-    private readonly Mock<HttpMessageHandler> handlerMock = new();
+    private readonly Mock<HttpMessageHandler> handlerMock;
+    private readonly Mock<ILogger> loggerMock;
+
+    public ScaniaClientTest()
+    {
+        handlerMock = new Mock<HttpMessageHandler>();
+        loggerMock = new Mock<ILogger>();
+        loggerMock.Setup(x => x.ForContext<ScaniaClient>()).Returns(loggerMock.Object);
+    }
 
     [Fact]
-    public async Task GetEsgReportAsync_Returns_Report()
+    public async Task GetVehicleEvaluationReportAsync_Returns_Report()
     {
         // Arrange
         Tenant tenant = new Tenant()
@@ -64,10 +73,10 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         // Act
-        var result = await client.GetEsgReportAsync("vin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var result = await client.GetVehicleEvaluationReportAsync("vin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         // Assert
-        result.Should().NotBeNull().And.BeOfType<EsgVehicleReport>();
+        result.Should().NotBeNull().And.BeOfType<VehicleEvaluationReport>();
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Exactly(3),
@@ -80,7 +89,7 @@ public class ScaniaClientTest
     [InlineData(HttpStatusCode.Unauthorized)]
     [InlineData(HttpStatusCode.Conflict)]
     [InlineData(HttpStatusCode.InternalServerError)]
-    public async Task GetEsgReportAsync_Throws_HttpStatusCodeExceptions(HttpStatusCode statusCode)
+    public async Task GetVehicleEvaluationReportAsync_Throws_HttpStatusCodeExceptions(HttpStatusCode statusCode)
     {
         // Arrange
         Tenant tenant = new Tenant()
@@ -124,11 +133,11 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        Func<Task> action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        Func<Task> action = () => client.GetVehicleEvaluationReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
         
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -261,7 +270,7 @@ public class ScaniaClientTest
         
         //Assert
         var exception = await result.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Exactly(3),
@@ -417,7 +426,7 @@ public class ScaniaClientTest
 
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        exception.And.Message.Should().Contain(statusCode.ToString());
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync", 
             Times.Once(), 
@@ -490,16 +499,16 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var action = async () => await client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
         
         //Assert
         var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        exception.And.Message.Should().Contain(HttpStatusCode.BadRequest.ToString());
     }
 
     private ScaniaClient CreateClient(HttpClient client)
     {
-        return new ScaniaClient(client);
+        return new ScaniaClient(client, loggerMock.Object);
     }
 }
 

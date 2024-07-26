@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Serilog;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
 using SmartCraft.Core.Tellus.Domain.Models;
@@ -8,9 +10,9 @@ using SmartCraft.Core.Tellus.Domain.Services;
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class VehiclesControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<VehiclesController>> loggerMock = new();
+    private readonly Mock<ILogger> loggerMock = new();
     private readonly Mock<IVehiclesService> vehicleServiceMock = new();
-    private readonly Mock<IEsgService> esgServiceMock = new();
+    private readonly Mock<IVehicleEvaluationService> evaluationServiceMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();
 
     [Fact]
@@ -41,7 +43,7 @@ public class VehiclesControllerTest
     {   // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
-        esgServiceMock.Setup(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+        evaluationServiceMock.Setup(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
         // Act
         var result = await controller.GetVehiclesAsync("Volvo", Guid.NewGuid());
@@ -49,7 +51,7 @@ public class VehiclesControllerTest
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        evaluationServiceMock.Verify(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
     }
 
     [Fact]
@@ -58,14 +60,13 @@ public class VehiclesControllerTest
         // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
-        vehicleServiceMock.Setup(x => x.GetVehiclesAsync(It.IsAny<string>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
+        vehicleServiceMock.Setup(x => x.GetVehiclesAsync(It.IsAny<string>(), It.IsAny<Tenant>())).ThrowsAsync(new HttpRequestException("Error handling request"));
 
-        // Act
-        var result = await controller.GetVehiclesAsync("Volvo", Guid.NewGuid());
+        // Act 
+        Func<Task> act = async () => await controller.GetVehiclesAsync("Volvo", Guid.NewGuid());
 
         // Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
+        var exception = await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Error handling request");
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
         vehicleServiceMock.Verify(vehicleServiceMock => vehicleServiceMock.GetVehiclesAsync(It.IsAny<string>(), It.IsAny<Tenant>()), Times.Once);
     }
@@ -76,8 +77,8 @@ public class VehiclesControllerTest
         //Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
-        esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new EsgVehicleReport 
+        evaluationServiceMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(new VehicleEvaluationReport 
         { 
             VehicleEvaluations = new() 
         });
@@ -89,7 +90,7 @@ public class VehiclesControllerTest
         Assert.IsType<ActionResult<VehicleEvaluationReportResponse>>(result);
         Assert.NotNull((result.Result as OkObjectResult)?.Value);
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
+        evaluationServiceMock.Verify(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
     }
 
     [Fact]
@@ -97,8 +98,8 @@ public class VehiclesControllerTest
     {   // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
-        esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new EsgVehicleReport
+        evaluationServiceMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(new VehicleEvaluationReport
             {
             VehicleEvaluations = new()
         });
@@ -109,7 +110,7 @@ public class VehiclesControllerTest
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        evaluationServiceMock.Verify(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
     }
 
     [Fact]
@@ -118,8 +119,8 @@ public class VehiclesControllerTest
         // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
-        esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(null as EsgVehicleReport);
+        evaluationServiceMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(null as VehicleEvaluationReport);
 
         // Act
         var result = await controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
@@ -127,7 +128,7 @@ public class VehiclesControllerTest
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
+        evaluationServiceMock.Verify(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
     }
 
     [Fact]
@@ -136,20 +137,19 @@ public class VehiclesControllerTest
         // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
-        esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception());
+        evaluationServiceMock.Setup(x => x.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException("Wrong!"));
 
         // Act
-        var result = await controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
+        Func<Task> act = async () => await controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         // Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
+        var exception = await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Wrong!");
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
+        evaluationServiceMock.Verify(evaluationServiceMock => evaluationServiceMock.GetVehicleEvaluationReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
     }
 
     private VehiclesController CreateVehiclesController()
     {
-        return new VehiclesController(loggerMock.Object, vehicleServiceMock.Object, esgServiceMock.Object, tenantServiceMock.Object);
+        return new VehiclesController(loggerMock.Object, vehicleServiceMock.Object, evaluationServiceMock.Object, tenantServiceMock.Object);
     }
 }

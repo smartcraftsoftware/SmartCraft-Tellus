@@ -4,9 +4,9 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Mappers;
 public static class EsgMapper
 {
     #region Infra/Domain
-    public static Domain.Models.EsgVehicleReport ToDomainModel(this Infrastructure.Models.EsgVehicleReport vehicleReport)
+    public static Domain.Models.VehicleEvaluationReport ToDomainModel(this Infrastructure.Models.VehicleEvaluationReport vehicleReport)
     {
-        return new Domain.Models.EsgVehicleReport
+        return new Domain.Models.VehicleEvaluationReport
         {
             StartTime = vehicleReport.StartTime,
             StopTime = vehicleReport.StopTime,
@@ -30,9 +30,9 @@ public static class EsgMapper
             Vin = evaluation.Vin
         };
     }
-    public static Infrastructure.Models.EsgVehicleReport ToDataModel(this Domain.Models.EsgVehicleReport vehicleReport)
+    public static Infrastructure.Models.VehicleEvaluationReport ToDataModel(this Domain.Models.VehicleEvaluationReport vehicleReport)
     {
-        return new Infrastructure.Models.EsgVehicleReport
+        return new Infrastructure.Models.VehicleEvaluationReport
         {
             StartTime = vehicleReport.StartTime.ToUniversalTime(),
             StopTime = vehicleReport.StopTime?.ToUniversalTime(),
@@ -60,7 +60,7 @@ public static class EsgMapper
     #endregion
 
     #region Man
-    public static Domain.Models.EsgVehicleReport ToDomainModel(this ManPerformApiResponse apiResponse)
+    public static Domain.Models.VehicleEvaluationReport ToDomainModel(this ManPerformApiResponse apiResponse)
     {
         DateTime startTime;
         var startTimeParse = DateTime.TryParse(apiResponse?.StartTime, out startTime);
@@ -72,7 +72,7 @@ public static class EsgMapper
         TimeSpan timeDifference = stopTime - startTime;
         double totalHours = timeDifference.TotalHours;
 
-        return new Domain.Models.EsgVehicleReport
+        return new Domain.Models.VehicleEvaluationReport
         {
             StartTime = startTime,
             StopTime = stopTime,
@@ -95,7 +95,7 @@ public static class EsgMapper
     #endregion
 
     #region Volvo
-    public static Domain.Models.EsgVehicleReport ToDomainModel(this VolvoUtilizationScoreApiResponse apiResponse)
+    public static Domain.Models.VehicleEvaluationReport ToDomainModel(this VolvoUtilizationScoreApiResponse apiResponse)
     {
         DateTime startTime;
         var startTimeParse = DateTime.TryParse(apiResponse?.VuScoreResponse?.StartTime, out startTime);
@@ -108,14 +108,14 @@ public static class EsgMapper
         double totalHours = timeDifference.TotalHours;
 
         if (apiResponse?.VuScoreResponse?.Vehicles == null)
-            return new Domain.Models.EsgVehicleReport
+            return new Domain.Models.VehicleEvaluationReport
             {
                 StartTime = startTime,
                 StopTime = stopTime,
                 VehicleEvaluations = apiResponse?.VuScoreResponse?.Fleet?.ToDomainModel(totalHours) ?? new List<Domain.Models.VehicleEvaluation>()
             };
 
-        return new Domain.Models.EsgVehicleReport
+        return new Domain.Models.VehicleEvaluationReport
         {
             StartTime = startTime,
             StopTime = stopTime,
@@ -155,9 +155,9 @@ public static class EsgMapper
     #endregion
 
     #region Scania
-    public static Domain.Models.EsgVehicleReport ToDomainModel(this ScaniaVehicleEvaluationApiResponse apiResponse, DateTime startTime, DateTime? stopTime)
+    public static Domain.Models.VehicleEvaluationReport ToDomainModel(this ScaniaVehicleEvaluationApiResponse apiResponse, DateTime startTime, DateTime? stopTime)
     {
-        return new Domain.Models.EsgVehicleReport
+        return new Domain.Models.VehicleEvaluationReport
         {
             StartTime = startTime,
             StopTime = stopTime,

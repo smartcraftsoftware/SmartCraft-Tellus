@@ -11,7 +11,7 @@ public class ManClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "man";
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<VehicleEvaluationReport> GetVehicleEvaluationReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         UriBuilder uriBuilder = ClientHelpers.BuildUri("api.perform3.rio.cloud", $"api/assets/{vin}", $"from={startTime:yyyy-MM-dd}&to={stopTime:yyyy-MM-dd}");
         var credentials = tenant.ManToken ?? "";

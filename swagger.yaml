@@ -154,6 +154,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: vin
+          in: query
+          description: ''
+          schema:
+            type: string
         - name: tenantId
           in: header
           description: ''
@@ -249,13 +254,13 @@ paths:
             format: date-time
         - name: stopTime
           in: query
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: date-time
         - name: tenantId
           in: header
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: uuid
@@ -340,7 +345,7 @@ components:
           type: string
           nullable: true
         productionDate:
-          $ref: '#/components/schemas/ProductionDate'
+          $ref: '#/components/schemas/ProductionDateResponse'
         possibleFuelTypes:
           type: array
           items:
@@ -353,13 +358,12 @@ components:
           type: number
           format: double
           nullable: true
-        totalFuelTankCapacityGaseous:
-          type: number
-          format: double
+        noOfAxles:
+          type: integer
+          format: int32
           nullable: true
-        totalBatteryPackCapacity:
-          type: number
-          format: double
+        gearBoxType:
+          type: string
           nullable: true
         moreDataAvailable:
           type: boolean
@@ -411,7 +415,7 @@ components:
           format: double
           nullable: true
       additionalProperties: false
-    ProductionDate:
+    ProductionDateResponse:
       type: object
       properties:
         day:

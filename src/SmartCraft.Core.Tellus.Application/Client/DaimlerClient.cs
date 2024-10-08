@@ -16,7 +16,7 @@ public class DaimlerClient : IVehicleClient
         throw new NotImplementedException();
     }
 
-    public Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
+    public Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
     {
         throw new NotImplementedException();
     }

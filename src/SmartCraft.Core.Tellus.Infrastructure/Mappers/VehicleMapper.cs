@@ -66,15 +66,23 @@ public static class VehicleMapper
         {
             Vin = vehiclesApiResponse.Vin ?? string.Empty,
             CustomerVehicleName = vehiclesApiResponse.CustomerVehicleName,
-            RegistrationNumber = vehiclesApiResponse.RegistrationNumber,
             Brand = vehiclesApiResponse.Brand,
             PossibleFuelTypes = vehiclesApiResponse.PossibleFuelTypes,
             EmissionLevel = vehiclesApiResponse.EmissionLevel,
             TotalFuelTankVolume = vehiclesApiResponse.TotalFuelTankVolume,
-            TotalFuelTankCapacityGaseous = vehiclesApiResponse.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehiclesApiResponse.TotalBatteryPackCapacity,
+            NoOfAxles = vehiclesApiResponse.NoOfAxles,
+            GearBoxType = vehiclesApiResponse.GearBoxType,
+            ProductionDate = vehiclesApiResponse?.ProductionDate?.ToDomainModel()
         };
     }
+
+    public static Domain.Models.VehicleProductionDate ToDomainModel(this ApiResponse.VehicleProductionDate productionDate)
+        => new Domain.Models.VehicleProductionDate
+        {
+            Day = productionDate.Day,
+            Month = productionDate.Month,
+            Year = productionDate.Year
+        };
 
     public static StatusReport ToDomainModel(this ScaniaVehicleStatusResponse statusResponse)
     {
@@ -153,13 +161,15 @@ public static class VehicleMapper
         {
             Vin = vehiclesApiResponse?.Vin ?? string.Empty,
             CustomerVehicleName = vehiclesApiResponse?.CustomerVehicleName,
-            RegistrationNumber = vehiclesApiResponse?.RegistrationNumber,
             Brand = vehiclesApiResponse?.Brand,
             PossibleFuelTypes = vehiclesApiResponse?.PossibleFuelTypes,
             EmissionLevel = vehiclesApiResponse?.EmissionLevel,
             TotalFuelTankVolume = vehiclesApiResponse?.TotalFuelTankVolume,
-            TotalFuelTankCapacityGaseous = vehiclesApiResponse?.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehiclesApiResponse?.TotalBatteryPackCapacity,
+            GearBoxType = vehiclesApiResponse?.GearboxType,
+            NoOfAxles = vehiclesApiResponse?.NoOfAxles,
+            ProductionDate = vehiclesApiResponse?.ProductionDate?.ToDomainModel(),
+            TachographType = vehiclesApiResponse?.TachographType,
+            Type = vehiclesApiResponse?.Type,
         };
     }
 

@@ -41,7 +41,7 @@ public class ManClient(HttpClient client) : IVehicleClient
         throw new NotImplementedException();
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
     {
         UriBuilder uriBuilder = ClientHelpers.BuildUri("api.assets.rio.cloud", $"assets", $"identification_type=vin&status=active");
         var credentials = tenant.ManToken ?? "";

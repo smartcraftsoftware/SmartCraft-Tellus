@@ -11,12 +11,14 @@ public class VolvoVehicleResponse
 {
     public required string Vin { get; set; }
     public string? CustomerVehicleName { get; set; }
-    public string? RegistrationNumber { get; set; }
     public string? Brand { get; set; }
+    public string? Type { get; set; }
     public List<string>? PossibleFuelTypes { get; set; }
     public string? EmissionLevel { get; set; }
+    public string? TachographType { get; set; }
+    public int? NoOfAxles { get; set; }
+    public string? GearboxType { get; set; }
     public double? TotalFuelTankVolume { get; set; }
-    public double? TotalFuelTankCapacityGaseous { get; set; }
-    public double? TotalBatteryPackCapacity { get; set; }
     public bool MoreDataAvailable { get; set; }
+    public VehicleProductionDate? ProductionDate { get; set; }
 }

@@ -19,8 +19,6 @@ public class ScaniaVehicle
     public required string Vin { get; set; }
     [JsonPropertyName("customerVehicleName")]
     public string? CustomerVehicleName { get; set; }
-    [JsonPropertyName("registrationNumber")]
-    public string? RegistrationNumber { get; set; }
     [JsonPropertyName("brand")]
     public string? Brand { get; set; }
     [JsonPropertyName("possibleFuelType")]
@@ -29,10 +27,12 @@ public class ScaniaVehicle
     public string? EmissionLevel { get; set; }
     [JsonPropertyName("totalFuelTankVolume")]
     public double? TotalFuelTankVolume { get; set; }
-    [JsonPropertyName("totalFuelTankCapacityGaseous")]
-    public double? TotalFuelTankCapacityGaseous { get; set; }
-    [JsonPropertyName("totalBatteryPackCapacity")]
-    public double? TotalBatteryPackCapacity { get; set; }
+    [JsonPropertyName("productionDate")]
+    public VehicleProductionDate? ProductionDate { get; set; }
+    [JsonPropertyName("noOfAxles")]
+    public int? NoOfAxles { get; set; }
+    [JsonPropertyName("gearboxType")]
+    public string? GearBoxType { get; set; }
 }
 
 

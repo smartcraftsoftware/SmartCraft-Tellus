@@ -19,30 +19,28 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     /// Gets a list of vehicles in current users' fleet, based on the vehicle brand
     /// </summary>
     /// <param name="vehicleBrand"></param>
+    /// <param name="vin"></param>
     /// <param name="tenantId"></param>
     /// <returns>A list of vehicle objects</returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/vehicles")]
-    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, [FromHeader]Guid tenantId)
+    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId)
     {
         try
         {
-            logger.LogInformation("Getting vehicles for tenant {tenantId}", tenantId);
             var tenant = await tenantService.GetTenantAsync(tenantId);
             if(tenant == null)
             {
                 logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
-
             }
 
-            var vehicles = await vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
+            var vehicles = await vehicleService.GetVehiclesAsync(vehicleBrand, vin, tenant);
             if (vehicles == null)
                 return NotFound("Could not find vehicle");
 
-            logger.Log(LogLevel.Information, "Found {vehicleCount} vehicles", vehicles.Count);
             return Ok(vehicles.Select(x => x.ToVehicleResponse()));
         }
         catch (Exception ex)

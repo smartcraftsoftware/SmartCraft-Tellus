@@ -1,4 +1,5 @@
-﻿using SmartCraft.Core.Tellus.Domain.Models;
+﻿using FluentValidation.Validators;
+using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Utility;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
@@ -49,7 +50,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return esgResponse.ToDomainModel(startTime, stopTime);
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehicles", "");
         token ??= await AuthScania(tenant);
@@ -77,44 +78,12 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         var vehicleApiResponse = JsonSerializer.Deserialize<ScaniaVehiclesApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
 
-        return vehicleApiResponse?.VehicleResponse?.Vehicles?.Select(x => x.ToDomainModel()).ToList() ?? new List<Vehicle>();
-    }
+        var vehicles = vehicleApiResponse?.VehicleResponse?.Vehicles?.ToList() ?? new List<ScaniaVehicle>();
 
-    //public async Task<StatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
-    //{
-    //    token ??= await AuthScania(tenant); 
-    //
-    //    if (token == null)
-    //        throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
-    //    var param = new Dictionary<string, string>
-    //    {
-    //        { "vin", vin },
-    //        { "starttime", startTime.ToString() },
-    //        { "stoptime", stopTime.ToString() ?? DateTime.UtcNow.ToString() },
-    //        { "triggerFilter", "TIMER" },
-    //        { "contentFilter", "SNAPSHOT" },
-    //        { "datetype", "received" }
-    //    };
-    //    var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);
-    //
-    //    Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
-    //    {
-    //        { "Authorization", "Bearer " + token },
-    //        { "accept", "application/json; rfms=vehiclestatuses.v4.0" }
-    //    };
-    //    var request = ClientHelpers.BuildRequestMessage(HttpMethod.Get, uriBuilder, headerKeyValues);
-    //
-    //    #pragma warning disable CS8603 // Possible null reference return.
-    //    var response = await client.SendAsync(request);
-    //    if (response.StatusCode == HttpStatusCode.NotFound)
-    //        return null;
-    //    #pragma warning restore CS8603 // Possible null reference return.
-    //    
-    //    response.EnsureSuccessStatusCode();
-    //    var statusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
-    //
-    //    return statusResponse.ToDomainModel();
-    //}
+        return vin != null
+        ? vehicles.Where(v => v.Vin == vin).Select(v => v.ToDomainModel()).ToList()
+        : vehicles.Select(v => v.ToDomainModel()).ToList();
+    }
 
     public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {

@@ -1,5 +1,6 @@
 ﻿using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
+using System.Runtime.CompilerServices;
 
 namespace SmartCraft.Core.Tellus.Infrastructure.Mappers;
 
@@ -18,9 +19,23 @@ public static class VehicleMapper
             EmissionLevel = vehicle.EmissionLevel,
             TotalFuelTankVolume = vehicle.TotalFuelTankVolume,
             TotalFuelTankCapacityGaseous = vehicle.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehicle.TotalBatteryPackCapacity
+            TotalBatteryPackCapacity = vehicle.TotalBatteryPackCapacity,
+            Type = vehicle.Type,
+            TachographType = vehicle.TachographType,
+            ProductionDate = vehicle.ProductionDate?.ToDataModel(),
+            NoOfAxles = vehicle.NoOfAxles,
+            EngineType = vehicle.EngineType,
+            GearBoxType = vehicle.GearBoxType
         };
     }
+
+    public static Infrastructure.Models.VehicleProductionDate ToDataModel(this Domain.Models.VehicleProductionDate vehicleProductionDate)
+        => new Models.VehicleProductionDate
+        {
+            Day = vehicleProductionDate.Day,
+            Month = vehicleProductionDate.Month,
+            Year = vehicleProductionDate.Year,
+        };
     #endregion
 
     #region Man

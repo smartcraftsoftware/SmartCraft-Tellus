@@ -24,7 +24,7 @@ public class EsgService : IEsgService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime = default)
+    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 
@@ -54,11 +54,13 @@ public class EsgService : IEsgService
         return esgReport;
     }
 
-    private (DateTime, DateTime) ParseAndMatchDateTimeValues(DateTime startTime, DateTime stopTime)
+    private (DateTime, DateTime) ParseAndMatchDateTimeValues(DateTime startTime, DateTime? stopTime)
     {
+        var stopTimeValue = stopTime.HasValue ? stopTime.Value : DateTime.UtcNow;
+
         if (startTime.Kind == DateTimeKind.Unspecified)
             throw new InvalidOperationException("Start time needs to have timezone specified");
-        if (stopTime.Kind == DateTimeKind.Unspecified)
+        if (stopTimeValue.Kind == DateTimeKind.Unspecified)
             throw new InvalidOperationException("Stop time needs to have timezone specified");
 
         if (startTime > stopTime)
@@ -72,7 +74,7 @@ public class EsgService : IEsgService
             throw new InvalidOperationException("Start time cannot be greater than current time");
         }
 
-        var utcStopTime = stopTime.ToUniversalTime();
+        var utcStopTime = stopTimeValue.ToUniversalTime();
         if (utcStopTime > DateTime.UtcNow)
         {
             throw new InvalidOperationException("Stop time cannot be greater than current time");
@@ -83,7 +85,7 @@ public class EsgService : IEsgService
             throw new InvalidOperationException("Start time cannot be older than 3 months");
         }
 
-        return (startTime, stopTime);
+        return (startTime, stopTimeValue);
     }
 
     private bool MatchKeyvalue(string vehicleBrand)

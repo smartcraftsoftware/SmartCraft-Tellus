@@ -197,16 +197,14 @@ paths:
             type: string
         - name: startTime
           in: query
-          description: Start time of interval (yyyy-MM-dd)
+          description: Start time of interval (yyyyMMddHHmm)
           schema:
             type: string
-            format: date-time
         - name: stopTime
           in: query
-          description: Stop time of interval (yyyy-MM-dd)
+          description: Stop time of interval. Optional(yyyyMMddHHmm)
           schema:
             type: string
-            format: date-time
         - name: tenantId
           in: header
           description: Id of tenant
@@ -249,13 +247,13 @@ paths:
             format: date-time
         - name: stopTime
           in: query
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: date-time
         - name: tenantId
           in: header
-          description: Stop time of interval (yyyy-MM-dd hh:mm:ss)
+          description: Stop time of interval (yyyy-MM-dd hh:mm:ssZ)
           schema:
             type: string
             format: uuid

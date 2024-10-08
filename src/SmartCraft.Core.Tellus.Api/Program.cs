@@ -122,7 +122,7 @@ using (var scope = app.Services.CreateScope())
         .GetRequiredService<VehicleContext>();
     var tenantContext = scope.ServiceProvider
         .GetRequiredService<TenantContext>();
-
+    
     vehicleContext.Database.Migrate();
     tenantContext.Database.Migrate();
 }

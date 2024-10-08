@@ -11,7 +11,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "volvo";
 
-    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime? stopTime)
     {
         var uriBuilder = !string.IsNullOrEmpty(vin) ?
             ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}") :

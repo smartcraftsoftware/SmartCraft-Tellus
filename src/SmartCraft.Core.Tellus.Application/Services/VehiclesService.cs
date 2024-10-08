@@ -44,7 +44,7 @@ public class VehiclesService : IVehiclesService
         return vehicles;
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 

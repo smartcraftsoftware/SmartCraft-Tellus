@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Mappers;
 using SmartCraft.Core.Tellus.Domain.Services;
+using Serilog;
 
 namespace SmartCraft.Core.Tellus.Api.Controllers;
 
@@ -13,8 +14,19 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [Route("api/v{version:ApiVersion}/[controller]")]
 [ApiController]
 [Produces("application/json")]
-public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesService vehicleService, IEsgService esgService, ITenantService tenantService) : ControllerBase
+public class VehiclesController : ControllerBase
 {
+    private Serilog.ILogger _logger;
+    private readonly IVehiclesService _vehicleService;
+    private readonly IEsgService _esgService;
+    private readonly ITenantService _tenantService;
+    public VehiclesController(Serilog.ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ITenantService tenantService)
+    {
+        _logger = logger.ForContext<VehiclesController>();
+        _vehicleService = vehicleService;
+        _esgService = esgService;
+        _tenantService = tenantService;
+    }
     /// <summary>
     /// Gets a list of vehicles in current users' fleet, based on the vehicle brand
     /// </summary>
@@ -29,25 +41,21 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     {
         try
         {
-            logger.LogInformation("Getting vehicles for tenant {tenantId}", tenantId);
-            var tenant = await tenantService.GetTenantAsync(tenantId);
-            if(tenant == null)
+            var tenant = await _tenantService.GetTenantAsync(tenantId);
+            if (tenant == null)
             {
-                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
-
             }
 
-            var vehicles = await vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
-            if (vehicles == null)
-                return NotFound("Could not find vehicle");
+            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
+            if (vehicles == null || vehicles.Count == 0)
+                return NoContent();
 
-            logger.Log(LogLevel.Information, "Found {vehicleCount} vehicles", vehicles.Count);
             return Ok(vehicles.Select(x => x.ToVehicleResponse()));
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting vehicles for tenant {tenantId}", tenantId);
+            _logger.Error("Error getting vehicles for tenant {tenantId} with {ErrorMessage}", tenantId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -70,27 +78,22 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     {
         try
         {
-            logger.Log(LogLevel.Information, "Getting report for tenant {tenantId}", tenantId);
-            var tenant = await tenantService.GetTenantAsync(tenantId);
+            var tenant = await _tenantService.GetTenantAsync(tenantId);
             if (tenant == null)
             {
-                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
             }
-
-            var vehicle = await esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
             if (vehicle == null)
             {
-                logger.LogWarning("Could not find vehicle {vinOrId}", vinOrId);
-                return NotFound("Could not find vehicle");
+                return NoContent();
             }
 
-            logger.Log(LogLevel.Information, "Found vehicle {vinOrId}", vinOrId);
             return Ok(vehicle.ToResponse());
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting report for tenant {tenantId}", tenantId);
+            _logger.Error("Error getting report for {Tenant} with {ErrorMessage}", tenantId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -112,30 +115,23 @@ public class VehiclesController(ILogger<VehiclesController> logger, IVehiclesSer
     {
         try
         {
-            logger.Log(LogLevel.Information, "Fetching vehicle statuses for tenant {tenantId}", tenantId);
-            if (vinOrId != null)
-            {
-                logger.Log(LogLevel.Information, "...more specifically for {vehicleBrand} vehicle {vehicleId}", vehicleBrand, vinOrId);
-            }
-
-            var tenant = await tenantService.GetTenantAsync(tenantId);
+            var tenant = await _tenantService.GetTenantAsync(tenantId);
             if (tenant == null)
             {
-                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant");
             }
 
-            var statusReport = await vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
             return Ok(statusReport.ToIntervalRespone());
         }
         catch (HttpRequestException ex)
         {
-            logger.Log(LogLevel.Error, $"The vehicle client threw an HTTP request exception: \"{(int?)ex.StatusCode} {ex.Message}\"");
+            _logger.Error("The vehicle client threw an HTTP request {Exception}", ex);
             return StatusCode((int)ex.StatusCode, ex.Message);
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting vehicle status report for tenant {tenantId}", tenantId);
+            _logger.Error("Error getting vehicle status report for {Tenant} with {ErrorMessage}", tenantId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }

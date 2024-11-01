@@ -48,7 +48,7 @@ public class VehiclesController : ControllerBase
                 return NotFound("Could not find tenant");
             }
 
-            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
+            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, tenant);
             if (vehicles == null || vehicles.Count == 0)
                 return NoContent();
 

@@ -3,13 +3,9 @@ WORKDIR /src
 EXPOSE 8080
 EXPOSE 8081
 
-COPY ["src/SmartCraft.Core.Tellus.Api/SmartCraft.Core.Tellus.Api.csproj", "SmartCraft.Core.Tellus.Api/"]
-COPY ["src/SmartCraft.Core.Tellus.Application/SmartCraft.Core.Tellus.Application.csproj", "SmartCraft.Core.Tellus.Application/"]
-COPY ["src/SmartCraft.Core.Tellus.Domain/SmartCraft.Core.Tellus.Domain.csproj", "SmartCraft.Core.Tellus.Domain/"]
-COPY ["src/SmartCraft.Core.Tellus.Infrastructure/SmartCraft.Core.Tellus.Infrastructure.csproj", "SmartCraft.Core.Tellus.Infrastructure/"]
+COPY . ../
 
 RUN dotnet restore "SmartCraft.Core.Tellus.Api/SmartCraft.Core.Tellus.Api.csproj"
-COPY . ../
 WORKDIR /src/SmartCraft.Core.Tellus.Api
 RUN dotnet build "SmartCraft.Core.Tellus.Api.csproj" -c Release -o /app/build
 

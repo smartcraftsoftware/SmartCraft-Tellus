@@ -10,8 +10,15 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:ApiVersion}/[controller]")]
-public class TenantsController(ILogger<TenantsController> logger, ITenantService service) : ControllerBase
+public class TenantsController : ControllerBase
 {
+    private Serilog.ILogger _logger;
+    private readonly ITenantService _tenantService;
+    public TenantsController(Serilog.ILogger logger, ITenantService service)
+    {
+        _logger = logger.ForContext<TenantsController>();
+        _tenantService = service;
+    }
     /// <summary>
     /// Gets a tenant
     /// </summary>
@@ -25,11 +32,9 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     {
         try
         {
-            logger.Log(LogLevel.Information, "Getting tenant {tenantId}", tenantId);
-            var tenant = await service.GetTenantAsync(tenantId);
+            var tenant = await _tenantService.GetTenantAsync(tenantId);
             if(tenant == null)
             {
-                logger.LogWarning("Could not find tenant {tenantId}", tenantId);
                 return NotFound("Could not find tenant.");
             }
 
@@ -37,10 +42,11 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error getting tenant {tenantId}", tenantId);
+            _logger.Error("Error getting {Tenant} with {ErrorMessage}", tenantId, ex.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
     /// <summary>
     /// Creates a tenant
     /// </summary>
@@ -54,19 +60,17 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     {
         try
         {
-            var tenant = await service.GetTenantAsync(tenantId);
+            var tenant = await _tenantService.GetTenantAsync(tenantId);
             if (tenant != null)
             {
-                logger.LogWarning("Tenant already exists");
                 return BadRequest("Tenant already exists");
             }
 
-            logger.Log(LogLevel.Information, "Registering tenant");
-            return Ok(await service.RegisterTenantAsync(tenantId, tenantRequest.ToDomainModel()));
+            return Ok(await _tenantService.RegisterTenantAsync(tenantId, tenantRequest.ToDomainModel()));
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error registering tenant");
+            _logger.Error("Error creating tenant with {ErrorMessage}", ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -84,14 +88,13 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     {
         try
         {
-            logger.Log(LogLevel.Information, "Updating tenant {tenantId}", tenantId);
             var tenantToUpdate = tenantRequest.ToDomainModel();
-            var updatedTenant = await service.UpdateTenantAsync(tenantId, tenantToUpdate);
+            var updatedTenant = await _tenantService.UpdateTenantAsync(tenantId, tenantToUpdate);
             return Ok(updatedTenant);
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error updating tenant {tenantId}", tenantId);
+            _logger.Error( "Error updating tenant {Tenant} with {ErrorMessage}", tenantId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -109,19 +112,15 @@ public class TenantsController(ILogger<TenantsController> logger, ITenantService
     {
         try
         {
-            logger.Log(LogLevel.Information, "Deleting tenant {tenantId}", tenantId);
-            if(await service.DeleteTenant(tenantId))
+            if(await _tenantService.DeleteTenant(tenantId))
             {
-                logger.Log(LogLevel.Information, "Tenant {tenantId} has been deleted", tenantId);
                 return NoContent();
             }
-
-            logger.LogWarning("Could not find tenant {tenantId}", tenantId);
             return NotFound();
         }
         catch (Exception ex)
         {
-            logger.Log(LogLevel.Error, ex, "Error deleting tenant {tenantId}", tenantId);
+            _logger.Error("Error deleting {Tenant} with {ErrorMessage}", tenantId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }

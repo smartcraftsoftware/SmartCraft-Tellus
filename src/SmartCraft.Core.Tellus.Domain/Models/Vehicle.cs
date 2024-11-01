@@ -14,4 +14,9 @@ public class Vehicle
     public double? TotalFuelTankVolume { get; set; }
     public double? TotalFuelTankCapacityGaseous { get; set; }
     public double? TotalBatteryPackCapacity { get; set; }
+    public int? NoOfAxles { get; set; }
+    public string? GearBoxType { get; set; }
+    public string? TachographType { get; set; }
+    public string? Type { get; set; }
+    public VehicleProductionDate? ProductionDate { get; set; }
 }

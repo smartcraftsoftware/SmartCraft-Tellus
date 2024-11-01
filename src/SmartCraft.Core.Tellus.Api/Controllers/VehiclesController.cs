@@ -31,13 +31,14 @@ public class VehiclesController : ControllerBase
     /// Gets a list of vehicles in current users' fleet, based on the vehicle brand
     /// </summary>
     /// <param name="vehicleBrand"></param>
+    /// <param name="vin"></param>
     /// <param name="tenantId"></param>
     /// <returns>A list of vehicle objects</returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{vehicleBrand}/vehicles")]
-    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, [FromHeader]Guid tenantId)
+    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId)
     {
         try
         {
@@ -50,6 +51,7 @@ public class VehiclesController : ControllerBase
             var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, tenant);
             if (vehicles == null || vehicles.Count == 0)
                 return NoContent();
+
 
             return Ok(vehicles.Select(x => x.ToVehicleResponse()));
         }

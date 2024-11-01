@@ -145,7 +145,7 @@ public class VolvoClientTest
         var client = CreateVolvoClient(httpClient);
 
         //Act
-        var result = await client.GetVehiclesAsync(tenant);
+        var result = await client.GetVehiclesAsync(tenant, null);
 
         //Assert
         result.Should().NotBeNull()

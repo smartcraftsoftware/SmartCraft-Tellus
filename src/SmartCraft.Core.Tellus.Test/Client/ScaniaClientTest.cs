@@ -193,7 +193,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var result = await client.GetVehiclesAsync(tenant);
+        var result = await client.GetVehiclesAsync(tenant, null);
 
         //Assert
         result.Should().NotBeNull().
@@ -257,7 +257,7 @@ public class ScaniaClientTest
         var client = CreateClient(httpClient);
 
         //Act
-        var result = () => client.GetVehiclesAsync(tenant);
+        var result = () => client.GetVehiclesAsync(tenant, null);
         
         //Assert
         var exception = await result.Should().ThrowAsync<HttpRequestException>();

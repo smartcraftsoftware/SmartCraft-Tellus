@@ -1,5 +1,6 @@
 ﻿using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
+using System.Runtime.CompilerServices;
 
 namespace SmartCraft.Core.Tellus.Infrastructure.Mappers;
 
@@ -18,9 +19,23 @@ public static class VehicleMapper
             EmissionLevel = vehicle.EmissionLevel,
             TotalFuelTankVolume = vehicle.TotalFuelTankVolume,
             TotalFuelTankCapacityGaseous = vehicle.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehicle.TotalBatteryPackCapacity
+            TotalBatteryPackCapacity = vehicle.TotalBatteryPackCapacity,
+            Type = vehicle.Type,
+            TachographType = vehicle.TachographType,
+            ProductionDate = vehicle.ProductionDate?.ToDataModel(),
+            NoOfAxles = vehicle.NoOfAxles,
+            EngineType = vehicle.EngineType,
+            GearBoxType = vehicle.GearBoxType
         };
     }
+
+    public static Infrastructure.Models.VehicleProductionDate ToDataModel(this Domain.Models.VehicleProductionDate vehicleProductionDate)
+        => new Models.VehicleProductionDate
+        {
+            Day = vehicleProductionDate.Day,
+            Month = vehicleProductionDate.Month,
+            Year = vehicleProductionDate.Year,
+        };
     #endregion
 
     #region Man
@@ -66,15 +81,23 @@ public static class VehicleMapper
         {
             Vin = vehiclesApiResponse.Vin ?? string.Empty,
             CustomerVehicleName = vehiclesApiResponse.CustomerVehicleName,
-            RegistrationNumber = vehiclesApiResponse.RegistrationNumber,
             Brand = vehiclesApiResponse.Brand,
             PossibleFuelTypes = vehiclesApiResponse.PossibleFuelTypes,
             EmissionLevel = vehiclesApiResponse.EmissionLevel,
             TotalFuelTankVolume = vehiclesApiResponse.TotalFuelTankVolume,
-            TotalFuelTankCapacityGaseous = vehiclesApiResponse.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehiclesApiResponse.TotalBatteryPackCapacity,
+            NoOfAxles = vehiclesApiResponse.NoOfAxles,
+            GearBoxType = vehiclesApiResponse.GearBoxType,
+            ProductionDate = vehiclesApiResponse?.ProductionDate?.ToDomainModel()
         };
     }
+
+    public static Domain.Models.VehicleProductionDate ToDomainModel(this ApiResponse.VehicleProductionDate productionDate)
+        => new Domain.Models.VehicleProductionDate
+        {
+            Day = productionDate.Day,
+            Month = productionDate.Month,
+            Year = productionDate.Year
+        };
 
     public static StatusReport ToDomainModel(this ScaniaVehicleStatusResponse statusResponse)
     {
@@ -153,13 +176,15 @@ public static class VehicleMapper
         {
             Vin = vehiclesApiResponse?.Vin ?? string.Empty,
             CustomerVehicleName = vehiclesApiResponse?.CustomerVehicleName,
-            RegistrationNumber = vehiclesApiResponse?.RegistrationNumber,
             Brand = vehiclesApiResponse?.Brand,
             PossibleFuelTypes = vehiclesApiResponse?.PossibleFuelTypes,
             EmissionLevel = vehiclesApiResponse?.EmissionLevel,
             TotalFuelTankVolume = vehiclesApiResponse?.TotalFuelTankVolume,
-            TotalFuelTankCapacityGaseous = vehiclesApiResponse?.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehiclesApiResponse?.TotalBatteryPackCapacity,
+            GearBoxType = vehiclesApiResponse?.GearboxType,
+            NoOfAxles = vehiclesApiResponse?.NoOfAxles,
+            ProductionDate = vehiclesApiResponse?.ProductionDate?.ToDomainModel(),
+            TachographType = vehiclesApiResponse?.TachographType,
+            Type = vehiclesApiResponse?.Type,
         };
     }
 

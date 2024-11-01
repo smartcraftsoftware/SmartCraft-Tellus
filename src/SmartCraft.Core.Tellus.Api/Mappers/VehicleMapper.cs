@@ -1,10 +1,11 @@
 ﻿using SmartCraft.Core.Tellus.Api.Contracts.Responses;
+using SmartCraft.Core.Tellus.Domain.Models;
 
 namespace SmartCraft.Core.Tellus.Api.Mappers;
 
 public static class VehicleMapper
 {
-    public static GetVehicleResponse ToVehicleResponse(this Domain.Models.Vehicle vehicle)
+    public static GetVehicleResponse ToVehicleResponse(this Vehicle vehicle)
     {
         return new GetVehicleResponse()
         {
@@ -16,8 +17,17 @@ public static class VehicleMapper
             PossibleFuelTypes = vehicle.PossibleFuelTypes,
             EmissionLevel = vehicle.EmissionLevel,
             TotalFuelTankVolume = vehicle.TotalFuelTankVolume,
-            TotalFuelTankCapacityGaseous = vehicle.TotalFuelTankCapacityGaseous,
-            TotalBatteryPackCapacity = vehicle.TotalBatteryPackCapacity,
+            GearBoxType = vehicle.GearBoxType,
+            NoOfAxles = vehicle.NoOfAxles,
+            ProductionDate = vehicle?.ProductionDate?.ToResponse()
         };
     }
+
+    public static ProductionDateResponse ToResponse(this VehicleProductionDate productionDate)
+        => new ProductionDateResponse
+        {
+            Day = productionDate.Day,
+            Month = productionDate.Month,
+            Year = productionDate.Year,
+        };
 }

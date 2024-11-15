@@ -28,6 +28,7 @@ var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
+builder.Services.AddSingleton(Log.Logger);
 builder.Logging.ClearProviders();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(logger, dispose: true));
 
@@ -118,13 +119,13 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var vehicleContext = scope.ServiceProvider
-        .GetRequiredService<VehicleContext>();
-    var tenantContext = scope.ServiceProvider
-        .GetRequiredService<TenantContext>();
-
-    vehicleContext.Database.Migrate();
-    tenantContext.Database.Migrate();
+    //var vehicleContext = scope.ServiceProvider
+    //    .GetRequiredService<VehicleContext>();
+    //var tenantContext = scope.ServiceProvider
+    //    .GetRequiredService<TenantContext>();
+    //
+    //vehicleContext.Database.Migrate();
+    //tenantContext.Database.Migrate();
 }
 
 

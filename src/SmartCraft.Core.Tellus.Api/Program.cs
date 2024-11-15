@@ -119,13 +119,13 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    //var vehicleContext = scope.ServiceProvider
-    //    .GetRequiredService<VehicleContext>();
-    //var tenantContext = scope.ServiceProvider
-    //    .GetRequiredService<TenantContext>();
-    //
-    //vehicleContext.Database.Migrate();
-    //tenantContext.Database.Migrate();
+    var vehicleContext = scope.ServiceProvider
+        .GetRequiredService<VehicleContext>();
+    var tenantContext = scope.ServiceProvider
+        .GetRequiredService<TenantContext>();
+    
+    vehicleContext.Database.Migrate();
+    tenantContext.Database.Migrate();
 }
 
 

@@ -114,7 +114,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 #pragma warning disable CS8603 // Possible null reference return.
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new HttpRequestException("Volvo: could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+            throw new HttpRequestException("Could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
 #pragma warning restore CS8603 // Possible null reference return.
 
         response.EnsureSuccessStatusCode();

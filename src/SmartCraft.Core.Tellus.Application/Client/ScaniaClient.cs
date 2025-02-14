@@ -24,7 +24,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
             ClientHelpers.BuildUri("https://dataaccess.scania.com", "/cs/vehicle/reports/VehicleEvaluationReport/v2", $"startDate={startTime}&endDate={stopTime}&vinOfInterest={vin}");
 
         if (token == null)
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new UnauthorizedAccessException();
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {
@@ -56,7 +56,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         token ??= await AuthScania(tenant);
 
         if (token == null)
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new UnauthorizedAccessException();
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {
@@ -90,7 +90,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         token ??= await AuthScania(tenant);
 
         if (token == null)
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new UnauthorizedAccessException();
 
         var param = new Dictionary<string, string>
         {

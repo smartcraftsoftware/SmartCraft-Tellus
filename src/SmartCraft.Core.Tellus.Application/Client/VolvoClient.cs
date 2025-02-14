@@ -106,7 +106,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         var credentials = tenant?.VolvoCredentials ?? "";
 
         if (string.IsNullOrEmpty(credentials))
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString("Invalid credentials"));
+            throw new UnauthorizedAccessException();
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {

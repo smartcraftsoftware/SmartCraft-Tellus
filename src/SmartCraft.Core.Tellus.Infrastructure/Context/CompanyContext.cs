@@ -20,4 +20,5 @@ public class CompanyContext : DbContext
     }
 
     public DbSet<Company> Companies { get; set; }
+    public DbSet<Tenant> Tenants { get; set; }
 }

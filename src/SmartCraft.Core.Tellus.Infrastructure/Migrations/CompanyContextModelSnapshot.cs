@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
@@ -12,11 +11,9 @@ using SmartCraft.Core.Tellus.Infrastructure.Context;
 namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 {
     [DbContext(typeof(CompanyContext))]
-    [Migration("20250312121012_TenantRenameToCompany")]
-    partial class TenantRenameToCompany
+    partial class CompanyContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,6 +64,44 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("SmartCraft.Core.Tellus.Infrastructure.Models.Tenant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DaimlerToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastUpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ManToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScaniaClientId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScaniaSecretKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("VolvoCredentials")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tenants");
                 });
 #pragma warning restore 612, 618
         }

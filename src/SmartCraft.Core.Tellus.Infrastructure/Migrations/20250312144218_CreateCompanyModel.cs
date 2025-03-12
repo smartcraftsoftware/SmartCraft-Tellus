@@ -6,14 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class TenantRenameToCompany : Migration
+    public partial class CreateCompanyModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Tenants");
-
             migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
@@ -47,26 +44,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Companies");
-
-            migrationBuilder.CreateTable(
-                name: "Tenants",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    DaimlerToken = table.Column<string>(type: "text", nullable: true),
-                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastUpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    ManToken = table.Column<string>(type: "text", nullable: true),
-                    ScaniaClientId = table.Column<string>(type: "text", nullable: true),
-                    ScaniaSecretKey = table.Column<string>(type: "text", nullable: true),
-                    VolvoCredentials = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tenants", x => x.Id);
-                });
         }
     }
 }

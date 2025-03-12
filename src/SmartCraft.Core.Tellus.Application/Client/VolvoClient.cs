@@ -11,7 +11,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "volvo";
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         var uriBuilder = !string.IsNullOrEmpty(vin) ?
             ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}") :
@@ -46,7 +46,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Company tenant, string? vin)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehicles");
         var credentials = tenant?.VolvoCredentials ?? "";
@@ -86,7 +86,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         : vehicles.Select(v => v.ToDomainModel()).ToList();
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime) {
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime) {
 
         TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)

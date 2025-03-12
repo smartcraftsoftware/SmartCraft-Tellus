@@ -11,7 +11,7 @@ public class ManClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "man";
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         UriBuilder uriBuilder = ClientHelpers.BuildUri("api.perform3.rio.cloud", $"api/assets/{vin}", $"from={startTime:yyyy-MM-dd}&to={stopTime:yyyy-MM-dd}");
         var credentials = tenant.ManToken ?? "";
@@ -36,12 +36,12 @@ public class ManClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
-    public Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Company tenant, string? vin)
     {
         UriBuilder uriBuilder = ClientHelpers.BuildUri("api.assets.rio.cloud", $"assets", $"identification_type=vin&status=active");
         var credentials = tenant.ManToken ?? "";

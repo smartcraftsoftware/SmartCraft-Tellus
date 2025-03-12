@@ -5,7 +5,7 @@ using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 namespace SmartCraft.Core.Tellus.Api.Mappers;
 public static class TenantMapper
 {
-    public static GetTenantResponse ToResponseContract(this Domain.Models.Tenant tenant)
+    public static GetTenantResponse ToResponseContract(this Domain.Models.Company tenant)
     {
         return new GetTenantResponse
         {
@@ -17,9 +17,9 @@ public static class TenantMapper
         };
     }
 
-    public static Domain.Models.Tenant ToDomainModel(this AddTenantRequest tenantRequest)
+    public static Domain.Models.Company ToDomainModel(this AddTenantRequest tenantRequest)
     {
-        return new Domain.Models.Tenant
+        return new Domain.Models.Company
         {
             DaimlerToken = tenantRequest.DaimlerToken,
             ManToken = tenantRequest.ManToken,
@@ -29,9 +29,9 @@ public static class TenantMapper
         };
     }
 
-    public static Domain.Models.Tenant ToDomainModel(this UpdateTenantRequest tenantRequest)
+    public static Domain.Models.Company ToDomainModel(this UpdateTenantRequest tenantRequest)
     {
-        return new Domain.Models.Tenant
+        return new Domain.Models.Company
         {
             DaimlerToken = tenantRequest.DaimlerToken,
             ManToken = tenantRequest.ManToken,

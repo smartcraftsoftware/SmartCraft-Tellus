@@ -15,7 +15,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
     public string VehicleBrand => "scania";
     string? token;
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         token ??= await AuthScania(tenant);
 
@@ -50,7 +50,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return esgResponse.ToDomainModel(startTime, stopTime);
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Company tenant, string? vin)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehicles", "");
         token ??= await AuthScania(tenant);
@@ -85,7 +85,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         : vehicles.Select(v => v.ToDomainModel()).ToList();
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         token ??= await AuthScania(tenant);
 
@@ -144,7 +144,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         return scaniaVehicleStatusResponse.ToIntervalDomainModel();
     }
 
-    private async Task<string> AuthScania(Tenant tenant)
+    private async Task<string> AuthScania(Company tenant)
     {
         //Build api request
         var uri = ClientHelpers.BuildUri("https://dataaccess.scania.com", "auth/clientid2challenge", $"");

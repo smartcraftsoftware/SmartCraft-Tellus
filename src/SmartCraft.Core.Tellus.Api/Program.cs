@@ -112,7 +112,7 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Tenant, TenantContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Tenant, TenantContext>>();
+builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, TenantContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, TenantContext>>();
 
 
 var app = builder.Build();

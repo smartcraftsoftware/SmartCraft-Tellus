@@ -6,9 +6,9 @@ using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 
 namespace SmartCraft.Core.Tellus.Application.Services;
 
-public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantContext> repository) : ITenantService
+public class TenantService(IRepository<Infrastructure.Models.Company, TenantContext> repository) : ITenantService
 {
-    public async Task<Tenant?> GetTenantAsync(Guid id)
+    public async Task<Company?> GetTenantAsync(Guid id)
     {
         var tenant = await repository.Get(id);
         if (tenant == null)
@@ -16,20 +16,20 @@ public class TenantService(IRepository<Infrastructure.Models.Tenant, TenantConte
         return tenant.ToDomainModel();
     }
 
-    public async Task<List<Tenant>> GetTenantsAsync()
+    public async Task<List<Company>> GetTenantsAsync()
     {
         var tenants = await repository.GetAll();
         return tenants.Select(x => x.ToDomainModel()).ToList();
     }
 
-    public async Task<Guid> RegisterTenantAsync(Guid tenantId, Tenant tenant)
+    public async Task<Guid> RegisterTenantAsync(Guid tenantId, Company tenant)
     {
         var tenantToAdd = tenant.ToCreateTenantModel(tenantId);
         await repository.Add(tenantToAdd, tenantId);
         return tenantToAdd.Id;
     }
 
-    public async Task<Tenant> UpdateTenantAsync(Guid id, Tenant tenant)
+    public async Task<Company> UpdateTenantAsync(Guid id, Company tenant)
     {
         var existingTenant = await repository.Get(id);
         if (existingTenant == null)

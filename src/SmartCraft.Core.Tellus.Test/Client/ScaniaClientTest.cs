@@ -16,7 +16,7 @@ public class ScaniaClientTest
     public async Task GetEsgReportAsync_Returns_Report()
     {
         // Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -83,7 +83,7 @@ public class ScaniaClientTest
     public async Task GetEsgReportAsync_Throws_HttpStatusCodeExceptions(HttpStatusCode statusCode)
     {
         // Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -141,7 +141,7 @@ public class ScaniaClientTest
     public async Task GetVehiclesAsync_Returns_List_Of_Vehicles()
     {
         //Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -215,7 +215,7 @@ public class ScaniaClientTest
     public async Task GetVechiclesAsync_Throws_HttpRequestException(HttpStatusCode statusCode)
     {
         //Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -274,7 +274,7 @@ public class ScaniaClientTest
     public async Task GetVehicleStatusAsync_Returns_StatusReport()
     {
         //Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -355,7 +355,7 @@ public class ScaniaClientTest
     public async Task GetVehicleStatusAsync_Throws_HttpStatusCodeExceptions(HttpStatusCode statusCode)
     {
         //Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",
@@ -430,7 +430,7 @@ public class ScaniaClientTest
     public async Task GetVehicleStatusAsync_MissingToken_ThrowsException()
     {
         //Arrange
-        Tenant tenant = new Tenant()
+        Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
             ScaniaClientId = "1234",

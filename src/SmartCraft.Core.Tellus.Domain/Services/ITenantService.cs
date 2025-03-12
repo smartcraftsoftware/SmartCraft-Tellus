@@ -4,9 +4,9 @@ namespace SmartCraft.Core.Tellus.Domain.Services;
 
 public interface ITenantService
 {
-	Task<Guid> RegisterTenantAsync(Guid tenantId, Tenant tenant);
-	Task<Tenant?> GetTenantAsync(Guid id);
-	Task<List<Tenant>> GetTenantsAsync();
-	Task<Tenant> UpdateTenantAsync(Guid id, Tenant tenant);
+	Task<Guid> RegisterTenantAsync(Guid tenantId, Company tenant);
+	Task<Company?> GetTenantAsync(Guid id);
+	Task<List<Company>> GetTenantsAsync();
+	Task<Company> UpdateTenantAsync(Guid id, Company tenant);
 	Task<bool> DeleteTenant(Guid id);
 }

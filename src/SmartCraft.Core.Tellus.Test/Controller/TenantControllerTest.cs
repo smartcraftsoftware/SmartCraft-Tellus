@@ -24,7 +24,7 @@ public class TenantControllerTest
         //Arrange
         var controller = CreateController();
         var id = Guid.NewGuid();
-        var tenant = new Tenant
+        var tenant = new Company
         {
             Id = id,
             VolvoCredentials = "okokok"
@@ -45,7 +45,7 @@ public class TenantControllerTest
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Tenant);
+        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Company);
 
         //Act
         var result = await controller.Get(Guid.NewGuid());
@@ -80,7 +80,7 @@ public class TenantControllerTest
         {
             VolvoCredentials = "okokok"
         };
-        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ReturnsAsync(Guid.NewGuid());
+        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ReturnsAsync(Guid.NewGuid());
 
         //Act
         var result = await controller.Post(Guid.NewGuid(), tenantRequest);
@@ -88,7 +88,7 @@ public class TenantControllerTest
         //Assert
         Assert.IsType<ActionResult<Guid>>(result);
         Assert.NotNull((result.Result as OkObjectResult)?.Value);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class TenantControllerTest
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
+        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act
         var result = await controller.Post(Guid.NewGuid(), new AddTenantRequest());
@@ -104,7 +104,7 @@ public class TenantControllerTest
         //Assert
         Assert.IsType<ObjectResult>(result.Result);
         Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
@@ -117,14 +117,14 @@ public class TenantControllerTest
         {
             VolvoCredentials = "okokok"
         };
-        tenantServiceMock.Setup(x => x.UpdateTenantAsync(id, It.IsAny<Tenant>())).ReturnsAsync(new Tenant { Id = id});
+        tenantServiceMock.Setup(x => x.UpdateTenantAsync(id, It.IsAny<Company>())).ReturnsAsync(new Company { Id = id});
 
         //Act
         var result = await controller.Patch(id, tenantRequest);
 
         //Assert
         Assert.IsType<OkObjectResult>(result);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class TenantControllerTest
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
+        tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act
         var result = await controller.Patch(Guid.NewGuid(), new UpdateTenantRequest());
@@ -140,7 +140,7 @@ public class TenantControllerTest
         //Assert
         Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, (result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]

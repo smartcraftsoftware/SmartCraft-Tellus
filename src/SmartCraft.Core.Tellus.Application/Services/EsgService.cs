@@ -24,7 +24,7 @@ public class EsgService : IEsgService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Tenant tenant, DateTime startTime, DateTime stopTime = default)
+    public async Task<Domain.Models.EsgVehicleReport> GetEsgReportAsync(string vehicleBrand, string? vinNumber, Company tenant, DateTime startTime, DateTime stopTime = default)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 

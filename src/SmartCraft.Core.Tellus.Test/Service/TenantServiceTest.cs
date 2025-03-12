@@ -7,11 +7,11 @@ using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 namespace SmartCraft.Core.Tellus.Test.Service;
 public class TenantServiceTest
 {
-    public Mock<IRepository<Infrastructure.Models.Tenant, TenantContext>> repositoryMock;
+    public Mock<IRepository<Infrastructure.Models.Company, TenantContext>> repositoryMock;
     TenantService service;
     public TenantServiceTest()
     {
-        repositoryMock = new Mock<IRepository<Infrastructure.Models.Tenant, TenantContext>>();
+        repositoryMock = new Mock<IRepository<Infrastructure.Models.Company, TenantContext>>();
         service = new TenantService(repositoryMock.Object);
     }
 
@@ -19,7 +19,7 @@ public class TenantServiceTest
     public async Task GetTenantAsync_Success_ReturnsTenant()
     {
         // Arrange
-        var tenant = new Infrastructure.Models.Tenant
+        var tenant = new Infrastructure.Models.Company
         {
             Id = Guid.NewGuid(),
             DaimlerToken = "Daim",
@@ -45,7 +45,7 @@ public class TenantServiceTest
     public void GetTenantAsync_Fails_TenantNotExists()
     {
         // Arrange
-        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(null as Infrastructure.Models.Tenant);
+        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(null as Infrastructure.Models.Company);
 
         //Act and Assert
         Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetTenantAsync(Guid.NewGuid()));
@@ -55,33 +55,33 @@ public class TenantServiceTest
     public async Task RegisterTenantAsync_Success_ReturnsGuid()
     {
         //Arrange
-        var tenant = new Infrastructure.Models.Tenant()
+        var tenant = new Infrastructure.Models.Company()
         {
             Id = Guid.NewGuid(),
         };
-        repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
+        repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
         //Act
         var result = await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel());
 
         //Assert
         Assert.Equal(tenant.Id, result);
-        repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()), Times.Once);
+        repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
     public void RegisterTenantAsync_Fail_ThrowsException()
     {
         //Arrange
-        var tenant = new Infrastructure.Models.Tenant()
+        var tenant = new Infrastructure.Models.Company()
         {
             Id = Guid.NewGuid(),
         };
-        repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
+        repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
         //Act and Assert
         Task<Exception> exc = Assert.ThrowsAsync<Exception>(async () => await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel()));
-        repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()),Times.Once);
+        repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()),Times.Once);
     }
 
     [Fact]
@@ -89,20 +89,20 @@ public class TenantServiceTest
     {
         //Arrange
         var tenantId = Guid.NewGuid();
-        var tenant = new Domain.Models.Tenant()
+        var tenant = new Domain.Models.Company()
         {
             Id = tenantId,
             DaimlerToken = "Not Updated"
         };
 
-        var updatedTenant = new Infrastructure.Models.Tenant()
+        var updatedTenant = new Infrastructure.Models.Company()
         {
             Id = tenantId,
             DaimlerToken = "Updated"
         };
 
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(tenant.ToDataModel());
-        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ReturnsAsync(updatedTenant);
+        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ReturnsAsync(updatedTenant);
 
         //Act
         var result = await service.UpdateTenantAsync(tenantId, tenant);
@@ -111,7 +111,7 @@ public class TenantServiceTest
         Assert.Equal(updatedTenant.Id, result.Id);
         Assert.Equal(updatedTenant.DaimlerToken, result.DaimlerToken);
         Assert.NotEqual(tenant.DaimlerToken, result.DaimlerToken);
-        repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()), Times.Once);
+        repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
     }
 
@@ -119,13 +119,13 @@ public class TenantServiceTest
     public void UpdateTenantAsync_Fails_TenantNotExists()
     {
         //Arrange
-        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Infrastructure.Models.Tenant?)null);
-        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
+        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Infrastructure.Models.Company?)null);
+        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
 
         //Act and Assert
-        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateTenantAsync(Guid.NewGuid(), new Domain.Models.Tenant()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateTenantAsync(Guid.NewGuid(), new Domain.Models.Company()));
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
-        repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Tenant>(), It.IsAny<Guid>()), Times.Never);
+        repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]

@@ -1,9 +1,9 @@
 ﻿namespace SmartCraft.Core.Tellus.Infrastructure.Mappers;
 public static class TenantMapper
 {
-    public static Domain.Models.Tenant ToDomainModel(this Infrastructure.Models.Tenant tenant)
+    public static Domain.Models.Company ToDomainModel(this Infrastructure.Models.Company tenant)
     {
-        return new Domain.Models.Tenant
+        return new Domain.Models.Company
         {
             Id = tenant.Id,
             VolvoCredentials = tenant.VolvoCredentials,
@@ -15,9 +15,9 @@ public static class TenantMapper
         };
     }
 
-    public static Infrastructure.Models.Tenant ToDataModel(this Domain.Models.Tenant tenant)
+    public static Infrastructure.Models.Company ToDataModel(this Domain.Models.Company tenant)
     {
-        return new Infrastructure.Models.Tenant
+        return new Infrastructure.Models.Company
         {
             Id = tenant.Id,
             VolvoCredentials = tenant.VolvoCredentials,
@@ -28,9 +28,9 @@ public static class TenantMapper
         };
     }
 
-    public static Infrastructure.Models.Tenant ToCreateTenantModel(this Domain.Models.Tenant tenant, Guid tenantId)
+    public static Infrastructure.Models.Company ToCreateTenantModel(this Domain.Models.Company tenant, Guid tenantId)
     {
-        return new Infrastructure.Models.Tenant
+        return new Infrastructure.Models.Company
         {
             Id = tenantId,
             VolvoCredentials = tenant.VolvoCredentials,

@@ -20,7 +20,7 @@ public class VolvoClientTest
     public async Task GetEsgReportAsync_Returns_Report()
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"
@@ -72,7 +72,7 @@ public class VolvoClientTest
     public async Task GetEsgReport_Throws_HttpRequestException(HttpStatusCode statusCode)
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"
@@ -121,7 +121,7 @@ public class VolvoClientTest
     public async Task GetVehiclesAsync_Returns_List_Of_Vehicles()
     {
         //Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"
@@ -167,7 +167,7 @@ public class VolvoClientTest
     public async Task GetVehiclesAsync_Throws_HttpRequestException(HttpStatusCode statusCode)
     {
         //Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"
@@ -201,7 +201,7 @@ public class VolvoClientTest
     public async Task GetVehicleStatusAsync_Returns_StatusReport()
     {
         //Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"
@@ -254,7 +254,7 @@ public class VolvoClientTest
     public async Task GetVehicleStatusAsync_Throws_HttpRequestException(HttpStatusCode statusCode)
     {
         //Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid(),
             VolvoCredentials = "credentials"

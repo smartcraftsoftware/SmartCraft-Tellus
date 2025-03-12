@@ -8,7 +8,7 @@ using SmartCraft.Core.Tellus.Domain.Services;
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class VehiclesControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<VehiclesController>> loggerMock = new();
+    private readonly Mock<Serilog.ILogger> loggerMock = new();
     private readonly Mock<IVehiclesService> vehicleServiceMock = new();
     private readonly Mock<IEsgService> esgServiceMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();

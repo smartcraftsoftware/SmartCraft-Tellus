@@ -5,156 +5,157 @@ using SmartCraft.Core.Tellus.Infrastructure.Context;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 
 namespace SmartCraft.Core.Tellus.Test.Service;
-public class TenantServiceTest
+public class companyServiceTest
 {
-    public Mock<IRepository<Infrastructure.Models.Company, TenantContext>> repositoryMock;
-    TenantService service;
-    public TenantServiceTest()
+    public Mock<IRepository<Infrastructure.Models.Company, CompanyContext>> repositoryMock;
+    CompanyService service;
+    public companyServiceTest()
     {
-        repositoryMock = new Mock<IRepository<Infrastructure.Models.Company, TenantContext>>();
-        service = new TenantService(repositoryMock.Object);
+        repositoryMock = new Mock<IRepository<Infrastructure.Models.Company, CompanyContext>>();
+        service = new CompanyService(repositoryMock.Object);
     }
 
     [Fact]
-    public async Task GetTenantAsync_Success_ReturnsTenant()
+    public async Task GetcompanyAsync_Success_Returnscompany()
     {
         // Arrange
-        var tenant = new Infrastructure.Models.Company
+        var company = new Infrastructure.Models.Company
         {
             Id = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
             DaimlerToken = "Daim",
             ManToken = "Japp",
             ScaniaClientId = "Taragona",
             ScaniaSecretKey = "Dubbel Nougat"
         };
-        repositoryMock.Setup(x => x.Get(tenant.Id)).ReturnsAsync(tenant);
+        repositoryMock.Setup(x => x.Get(company.Id)).ReturnsAsync(company);
 
         //Act
-        var result = await service.GetTenantAsync(tenant.Id);
+        var result = await service.GetCompanyAsync(company.Id, company.TenantId);
 
         //Assert
-        Assert.Equal(tenant.Id, result?.Id);
-        Assert.Equal(tenant.DaimlerToken, result?.DaimlerToken);
-        Assert.Equal(tenant.ManToken, result?.ManToken);
-        Assert.Equal(tenant.ScaniaClientId, result?.ScaniaClientId);
-        Assert.Equal(tenant.ScaniaSecretKey, result?.ScaniaSecretKey);
-        repositoryMock.Verify(x => x.Get(tenant.Id), Times.Once);
+        Assert.Equal(company.Id, result?.Id);
+        Assert.Equal(company.DaimlerToken, result?.DaimlerToken);
+        Assert.Equal(company.ManToken, result?.ManToken);
+        Assert.Equal(company.ScaniaClientId, result?.ScaniaClientId);
+        Assert.Equal(company.ScaniaSecretKey, result?.ScaniaSecretKey);
+        repositoryMock.Verify(x => x.Get(company.Id), Times.Once);
     }
 
     [Fact]
-    public void GetTenantAsync_Fails_TenantNotExists()
+    public void GetcompanyAsync_Fails_companyNotExists()
     {
         // Arrange
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(null as Infrastructure.Models.Company);
 
         //Act and Assert
-        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetTenantAsync(Guid.NewGuid()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetCompanyAsync(Guid.NewGuid(), Guid.NewGuid()));
     }
 
     [Fact]
-    public async Task RegisterTenantAsync_Success_ReturnsGuid()
+    public async Task RegistercompanyAsync_Success_ReturnsGuid()
     {
         //Arrange
-        var tenant = new Infrastructure.Models.Company()
+        var company = new Infrastructure.Models.Company()
         {
             Id = Guid.NewGuid(),
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
         //Act
-        var result = await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel());
+        var result = await service.RegisterCompanyAsync(company.Id, company.ToDomainModel());
 
         //Assert
-        Assert.Equal(tenant.Id, result);
+        Assert.Equal(company.Id, result);
         repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public void RegisterTenantAsync_Fail_ThrowsException()
+    public void RegistercompanyAsync_Fail_ThrowsException()
     {
         //Arrange
-        var tenant = new Infrastructure.Models.Company()
+        var company = new Infrastructure.Models.Company()
         {
             Id = Guid.NewGuid(),
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
         //Act and Assert
-        Task<Exception> exc = Assert.ThrowsAsync<Exception>(async () => await service.RegisterTenantAsync(tenant.Id, tenant.ToDomainModel()));
+        Task<Exception> exc = Assert.ThrowsAsync<Exception>(async () => await service.RegisterCompanyAsync(company.Id, company.ToDomainModel()));
         repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()),Times.Once);
     }
 
     [Fact]
-    public async Task UpdateTenantAsync_Success_UpdatesTenant()
+    public async Task UpdatecompanyAsync_Success_Updatescompany()
     {
         //Arrange
-        var tenantId = Guid.NewGuid();
-        var tenant = new Domain.Models.Company()
+        var companyId = Guid.NewGuid();
+        var company = new Domain.Models.Company()
         {
-            Id = tenantId,
+            Id = companyId,
             DaimlerToken = "Not Updated"
         };
 
-        var updatedTenant = new Infrastructure.Models.Company()
+        var updatedcompany = new Infrastructure.Models.Company()
         {
-            Id = tenantId,
+            Id = companyId,
             DaimlerToken = "Updated"
         };
 
-        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(tenant.ToDataModel());
-        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ReturnsAsync(updatedTenant);
+        repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(company.ToDataModel());
+        repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ReturnsAsync(updatedcompany);
 
         //Act
-        var result = await service.UpdateTenantAsync(tenantId, tenant);
+        var result = await service.UpdateCompanyAsync(companyId, company);
 
         //Assert
-        Assert.Equal(updatedTenant.Id, result.Id);
-        Assert.Equal(updatedTenant.DaimlerToken, result.DaimlerToken);
-        Assert.NotEqual(tenant.DaimlerToken, result.DaimlerToken);
+        Assert.Equal(updatedcompany.Id, result.Id);
+        Assert.Equal(updatedcompany.DaimlerToken, result.DaimlerToken);
+        Assert.NotEqual(company.DaimlerToken, result.DaimlerToken);
         repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public void UpdateTenantAsync_Fails_TenantNotExists()
+    public void UpdatecompanyAsync_Fails_companyNotExists()
     {
         //Arrange
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Infrastructure.Models.Company?)null);
         repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
 
         //Act and Assert
-        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateTenantAsync(Guid.NewGuid(), new Domain.Models.Company()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateCompanyAsync(Guid.NewGuid(), new Domain.Models.Company()));
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]
-    public async Task DeleteTenant_Success_ReturnsTrue()
+    public async Task Deletecompany_Success_ReturnsTrue()
     {
         //Arrange
-        var tenantId = Guid.NewGuid();
-        repositoryMock.Setup(x => x.Delete(tenantId)).ReturnsAsync(true);
+        var companyId = Guid.NewGuid();
+        repositoryMock.Setup(x => x.Delete(companyId)).ReturnsAsync(true);
 
         //Act
-        var result = await service.DeleteTenant(tenantId);
+        var result = await service.DeleteCompany(companyId);
 
         //Assert
         Assert.True(result);
-        repositoryMock.Verify(x => x.Delete(tenantId), Times.Once);
+        repositoryMock.Verify(x => x.Delete(companyId), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteTenant_Fails_ReturnsFalse()
+    public async Task Deletecompany_Fails_ReturnsFalse()
     {
         //Arrange
-        var tenantId = Guid.NewGuid();
-        repositoryMock.Setup(x => x.Delete(tenantId)).ReturnsAsync(false);
+        var companyId = Guid.NewGuid();
+        repositoryMock.Setup(x => x.Delete(companyId)).ReturnsAsync(false);
 
         //Act
-        var result = await service.DeleteTenant(tenantId);
+        var result = await service.DeleteCompany(companyId);
 
         //Assert
         Assert.False(result);
-        repositoryMock.Verify(x => x.Delete(tenantId), Times.Once);
+        repositoryMock.Verify(x => x.Delete(companyId), Times.Once);
     }
 }

@@ -83,7 +83,7 @@ builder.Services.AddApiVersioning(apiVersioningOptions =>
 
 //DB
 builder.Services.AddDbContext<VehicleContext>(options => options.UseNpgsql(Configuration.GetConnectionString("VehicleConnectionString")));
-builder.Services.AddDbContext<TenantContext>(options => options.UseNpgsql(Configuration.GetConnectionString("TenantConnectionString")));
+builder.Services.AddDbContext<CompanyContext>(options => options.UseNpgsql(Configuration.GetConnectionString("TenantConnectionString")));
 
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -97,14 +97,14 @@ builder.Services.AddScoped<IVehicleClient, ManClient>();
 //Services
 builder.Services.AddScoped<IVehiclesService, VehiclesService>();
 builder.Services.AddScoped<IEsgService, EsgService>();
-builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 //Validators
 builder.Services.AddScoped<EsgReportValidator>();
 
 
 //Context
-builder.Services.AddScoped<TenantContext>();
+builder.Services.AddScoped<CompanyContext>();
 builder.Services.AddScoped<VehicleContext>();
 
 //Repositories
@@ -112,7 +112,7 @@ builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Mod
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>>();
 builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, TenantContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, TenantContext>>();
+builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, CompanyContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, CompanyContext>>();
 
 
 var app = builder.Build();
@@ -122,7 +122,7 @@ using (var scope = app.Services.CreateScope())
     var vehicleContext = scope.ServiceProvider
         .GetRequiredService<VehicleContext>();
     var tenantContext = scope.ServiceProvider
-        .GetRequiredService<TenantContext>();
+        .GetRequiredService<CompanyContext>();
     
     vehicleContext.Database.Migrate();
     tenantContext.Database.Migrate();

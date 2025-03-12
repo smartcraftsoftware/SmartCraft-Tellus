@@ -19,8 +19,8 @@ public class VehiclesController : ControllerBase
     private Serilog.ILogger _logger;
     private readonly IVehiclesService _vehicleService;
     private readonly IEsgService _esgService;
-    private readonly ITenantService _tenantService;
-    public VehiclesController(Serilog.ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ITenantService tenantService)
+    private readonly ICompanyService _tenantService;
+    public VehiclesController(Serilog.ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ICompanyService tenantService)
     {
         _logger = logger.ForContext<VehiclesController>();
         _vehicleService = vehicleService;
@@ -33,22 +33,23 @@ public class VehiclesController : ControllerBase
     /// <param name="vehicleBrand"></param>
     /// <param name="vin"></param>
     /// <param name="tenantId"></param>
+    /// <param name="companyId"></param>
     /// <returns>A list of vehicle objects</returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/vehicles")]
-    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId)
+    [HttpGet("{companyId}/{vehicleBrand}/vehicles")]
+    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId, Guid companyId)
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
 
-            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, tenant);
+            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, company);
             if (vehicles == null || vehicles.Count == 0)
                 return NoContent();
 
@@ -71,21 +72,22 @@ public class VehiclesController : ControllerBase
     /// <param name="startTime">Start time of interval (yyyy-MM-dd)</param>
     /// <param name="stopTime">Stop time of interval (yyyy-MM-dd)</param>
     /// <param name="tenantId">Id of tenant</param>
+    /// <param name="companyId"></param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/report")]
-    public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    [HttpGet("{companyId}/{vehicleBrand}/report")]
+    public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId)
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
-            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
             if (vehicle == null)
             {
                 return NoContent();
@@ -108,22 +110,23 @@ public class VehiclesController : ControllerBase
     /// <param name="startTime">Start time of interval (yyyy-MM-dd hh:mm:ss)</param>
     /// <param name="stopTime">Stop time of interval (yyyy-MM-dd hh:mm:ssZ)</param>
     /// <param name="tenantId">Stop time of interval (yyyy-MM-dd hh:mm:ssZ)</param>
+    /// <param name="companyId"></param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/vehiclestatus")]
-    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, string vinOrId = "")
+    [HttpGet("{companyId}/{vehicleBrand}/vehiclestatus")]
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId, string vinOrId = "")
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
 
-            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
             return Ok(statusReport.ToIntervalRespone());
         }
         catch (HttpRequestException ex)

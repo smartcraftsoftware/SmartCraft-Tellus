@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Shouldly;
 using SmartCraft.Core.Tellus.Api.Contracts.Requests;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
@@ -13,187 +14,197 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartCraft.Core.Tellus.Test.Controller;
-public class TenantControllerTest
+public class CompanyControllerTest
 {
     private readonly Mock<Serilog.ILogger> loggerMock = new();
-    private readonly Mock<ITenantService> tenantServiceMock = new();
+    private readonly Mock<ICompanyService> companyServiceMock = new();
 
     [Fact]
-    public async Task Get_Tenant_ReturnsTenant()
+    public async Task Get_company_Returnscompany()
     {
         //Arrange
         var controller = CreateController();
-        var id = Guid.NewGuid();
-        var tenant = new Company
+        var companyId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var company = new Company
         {
-            Id = id,
+            Id = companyId,
+            TenantId = companyId,
             VolvoCredentials = "okokok"
         };
-        tenantServiceMock.Setup(x => x.GetTenantAsync(id)).ReturnsAsync(tenant);
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(company);
 
         //Act
-        var result = await controller.Get(id);
+        var result = await controller.Get(companyId, companyId);
 
         //Assert
-        Assert.IsType<ActionResult<GetTenantResponse>>(result);
+        Assert.IsType<ActionResult<GetCompanyResponse>>(result);
         Assert.NotNull((result.Result as OkObjectResult)?.Value);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public async Task Get_Tenant_MissingTenant()
+    public async Task Get_company_Missingcompany()
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(null as Company);
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(null as Company);
 
         //Act
-        var result = await controller.Get(Guid.NewGuid());
+        var result = await controller.Get(Guid.NewGuid(), Guid.NewGuid());
 
         //Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public async Task Get_Tenant_ThrowsException()
+    public async Task Get_company_ThrowsException()
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ThrowsAsync(new Exception());
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
         //Act
-        var result = await controller.Get(Guid.NewGuid());
+        var result = await controller.Get(Guid.NewGuid(), Guid.NewGuid());
 
         //Assert
         Assert.IsType<ObjectResult>(result.Result);
         Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public async Task Post_Tenant_CreatesTenant()
+    public async Task Post_company_Createscompany()
     {
         //Arrange
         var controller = CreateController();
-        var tenantRequest = new AddTenantRequest
+        var companyRequest = new AddCompanyRequest
         {
             VolvoCredentials = "okokok"
         };
-        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ReturnsAsync(Guid.NewGuid());
+        companyServiceMock.Setup(x => x.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ReturnsAsync(Guid.NewGuid());
 
         //Act
-        var result = await controller.Post(Guid.NewGuid(), tenantRequest);
+        var result = await controller.Post(Guid.NewGuid(), companyRequest);
 
         //Assert
         Assert.IsType<ActionResult<Guid>>(result);
         Assert.NotNull((result.Result as OkObjectResult)?.Value);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
-    public async Task Post_Tenant_ThrowsException()
+    public async Task Post_company_ThrowsException()
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
+        companyServiceMock.Setup(x => x.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act
-        var result = await controller.Post(Guid.NewGuid(), new AddTenantRequest());
+        var result = await controller.Post(Guid.NewGuid(), new AddCompanyRequest());
 
         //Assert
         Assert.IsType<ObjectResult>(result.Result);
         Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
-    public async Task Patch_Tenant_UpdatesTenant()
+    public async Task Patch_company_Updatescompany()
     {
         //Arrange
         var controller = CreateController();
         var id = Guid.NewGuid();
-        var tenantRequest = new UpdateTenantRequest
+        var companyRequest = new UpdateCompanyRequest
         {
             VolvoCredentials = "okokok"
         };
-        tenantServiceMock.Setup(x => x.UpdateTenantAsync(id, It.IsAny<Company>())).ReturnsAsync(new Company { Id = id});
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(id, It.IsAny<Company>())).ReturnsAsync(new Company { Id = id});
 
         //Act
-        var result = await controller.Patch(id, tenantRequest);
+        var result = await controller.Patch(id, companyRequest);
 
         //Assert
         Assert.IsType<OkObjectResult>(result);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
-    public async Task Patch_Tenant_ThrowsException()
+    public async Task Patch_company_ThrowsException()
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act
-        var result = await controller.Patch(Guid.NewGuid(), new UpdateTenantRequest());
+        var result = await controller.Patch(Guid.NewGuid(), new UpdateCompanyRequest());
 
         //Assert
         Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, (result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
-    public async Task Delete_Tenant_DeletesTenant()
+    public async Task Delete_company_Deletescompany()
     {
         //Arrange
         var controller = CreateController();
         var id = Guid.NewGuid();
-        tenantServiceMock.Setup(x => x.DeleteTenant(id)).ReturnsAsync(true);
+        var companyId = Guid.NewGuid();
+        companyServiceMock.Setup(x => x.DeleteCompany(id)).ReturnsAsync(true);
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = id });
 
         //Act
-        var result = await controller.Delete(id);
+        var result = await controller.Delete(id, companyId);
 
         //Assert
         Assert.IsType<NoContentResult>(result);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.DeleteTenant(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.DeleteCompany(It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public async Task Delete_Tenant_MissingTenant()
+    public async Task Delete_company_Missingcompany()
     {
         //Arrange
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.DeleteTenant(It.IsAny<Guid>())).ReturnsAsync(false);
+        companyServiceMock.Setup(x => x.DeleteCompany(It.IsAny<Guid>())).ReturnsAsync(false);
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid() });
 
         //Act
-        var result = await controller.Delete(Guid.NewGuid());
+        var result = await controller.Delete(Guid.NewGuid(), Guid.NewGuid());
 
         //Assert
         Assert.IsType<NotFoundResult>(result);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.DeleteTenant(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.DeleteCompany(It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
-    public async Task Delete_Tenant_ThrowsException()
+    public async Task Delete_company_ThrowsException()
     {
         //Arrange
+        var company = new Company
+        {
+            Id = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
+        };
         var controller = CreateController();
-        tenantServiceMock.Setup(x => x.DeleteTenant(It.IsAny<Guid>())).ThrowsAsync(new Exception());
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(company);
+        companyServiceMock.Setup(x => x.DeleteCompany(It.IsAny<Guid>())).ThrowsAsync(new Exception());
+
 
         //Act
-        var result = await controller.Delete(Guid.NewGuid());
+        await Should.ThrowAsync<Exception>(async ()  => await controller.Delete(company.TenantId, company.Id));
 
         //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.DeleteTenant(It.IsAny<Guid>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.DeleteCompany(It.IsAny<Guid>()), Times.Once);
     }
 
 
 
-    private TenantsController CreateController()
+    private CompanyController CreateController()
     {
-        return new TenantsController(loggerMock.Object, tenantServiceMock.Object);
+        return new CompanyController(loggerMock.Object, companyServiceMock.Object);
     }
 }

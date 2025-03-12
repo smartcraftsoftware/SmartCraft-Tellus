@@ -11,7 +11,7 @@ using SmartCraft.Core.Tellus.Infrastructure.Context;
 
 namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 {
-    [DbContext(typeof(TenantContext))]
+    [DbContext(typeof(CompanyContext))]
     [Migration("20240614132218_initial_migration")]
     partial class initial_migration
     {

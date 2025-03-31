@@ -6,12 +6,6 @@ using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
 using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Services;
-using SmartCraft.Core.Tellus.Infrastructure.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class CompanyControllerTest
@@ -65,12 +59,8 @@ public class CompanyControllerTest
         var controller = CreateController();
         companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Get(Guid.NewGuid(), Guid.NewGuid());
-
-        //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
+        //Act & Assert
+        var result = await controller.Get(Guid.NewGuid(), Guid.NewGuid()).ShouldThrowAsync<Exception>();
         companyServiceMock.Verify(companyServiceMock => companyServiceMock.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
     }
 
@@ -101,12 +91,8 @@ public class CompanyControllerTest
         var controller = CreateController();
         companyServiceMock.Setup(x => x.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Post(Guid.NewGuid(), new AddCompanyRequest());
-
-        //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
+        //Act & Assert
+        var result = await controller.Post(Guid.NewGuid(), new AddCompanyRequest()).ShouldThrowAsync<Exception>();
         companyServiceMock.Verify(companyServiceMock => companyServiceMock.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
@@ -115,15 +101,17 @@ public class CompanyControllerTest
     {
         //Arrange
         var controller = CreateController();
-        var id = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var companyId = Guid.NewGuid();
         var companyRequest = new UpdateCompanyRequest
         {
             VolvoCredentials = "okokok"
         };
-        companyServiceMock.Setup(x => x.UpdateCompanyAsync(id, It.IsAny<Company>())).ReturnsAsync(new Company { Id = id});
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(tenantId, It.IsAny<Company>())).ReturnsAsync(new Company { Id = companyId});
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId });
 
         //Act
-        var result = await controller.Patch(id, companyRequest);
+        var result = await controller.Patch(tenantId, companyId, companyRequest);
 
         //Assert
         Assert.IsType<OkObjectResult>(result);
@@ -135,14 +123,11 @@ public class CompanyControllerTest
     {
         //Arrange
         var controller = CreateController();
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid() });
         companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Patch(Guid.NewGuid(), new UpdateCompanyRequest());
-
-        //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
+        //Act & Assert
+        var result = await controller.Patch(Guid.NewGuid(), Guid.NewGuid(), new UpdateCompanyRequest()).ShouldThrowAsync<Exception>();
         companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
@@ -151,13 +136,13 @@ public class CompanyControllerTest
     {
         //Arrange
         var controller = CreateController();
-        var id = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         var companyId = Guid.NewGuid();
-        companyServiceMock.Setup(x => x.DeleteCompany(id)).ReturnsAsync(true);
-        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = id });
+        companyServiceMock.Setup(x => x.DeleteCompany(companyId)).ReturnsAsync(true);
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId });
 
         //Act
-        var result = await controller.Delete(id, companyId);
+        var result = await controller.Delete(tenantId, companyId);
 
         //Assert
         Assert.IsType<NoContentResult>(result);

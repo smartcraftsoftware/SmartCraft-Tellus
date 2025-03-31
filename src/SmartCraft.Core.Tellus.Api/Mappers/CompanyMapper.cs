@@ -31,11 +31,11 @@ public static class CompanyMapper
         };
     }
 
-    public static Domain.Models.Company ToDomainModel(this UpdateCompanyRequest companyRequest)
+    public static Domain.Models.Company ToDomainModel(this UpdateCompanyRequest companyRequest, Guid companyId)
     {
         return new Domain.Models.Company
         {
-            TenantId = companyRequest.TenantId,
+            Id = companyId,
             DaimlerToken = companyRequest.DaimlerToken,
             ManToken = companyRequest.ManToken,
             ScaniaSecretKey = companyRequest.ScaniaSecretKey,

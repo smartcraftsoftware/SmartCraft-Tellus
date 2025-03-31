@@ -37,6 +37,16 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
                 table: "Companies",
                 columns: new[] { "Id", "TenantId" },
                 unique: true);
+
+            migrationBuilder.Sql(@"
+                INSERT INTO ""Companies"" (
+                    ""Id"", ""TenantId"", ""VolvoCredentials"", ""ScaniaClientId"", ""ScaniaSecretKey"", 
+                    ""ManToken"", ""DaimlerToken"", ""CreatedAt"", ""LastUpdated"", ""CreatedBy"", ""LastUpdatedBy"")
+                SELECT 
+                    ""Id"", ""Id"", ""VolvoCredentials"", ""ScaniaClientId"", ""ScaniaSecretKey"", 
+                    ""ManToken"", ""DaimlerToken"", NOW(), NOW(), ""Id"", ""Id""
+                FROM ""tenants"";
+");
         }
 
         /// <inheritdoc />

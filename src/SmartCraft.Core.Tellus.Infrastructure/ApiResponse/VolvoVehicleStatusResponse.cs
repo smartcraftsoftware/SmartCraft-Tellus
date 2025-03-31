@@ -10,7 +10,7 @@ public class VolvoVehicleStatus
     public required string Vin { get; set; }
     public DateTime? CreatedDateTime { get; set; }
     public DateTime? ReceivedDateTime { get; set; }
-    public int? HrTotalVehicleDistance { get; set; }
+    public long? HrTotalVehicleDistance { get; set; }
     public double? TotalEngineHours { get; set; }
     public double? TotalElectricMotorHours { get; set; }
     public double? EngineTotalFuelUsed { get; set; }

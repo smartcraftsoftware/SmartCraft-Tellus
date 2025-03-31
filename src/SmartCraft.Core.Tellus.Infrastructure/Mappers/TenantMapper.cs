@@ -34,7 +34,7 @@ public static class TenantMapper
     {
         return new Infrastructure.Models.Company
         {
-            Id = company.Id,
+            Id = Guid.NewGuid(),
             TenantId = tenantId,
             VolvoCredentials = company.VolvoCredentials,
             ScaniaClientId = company.ScaniaClientId,

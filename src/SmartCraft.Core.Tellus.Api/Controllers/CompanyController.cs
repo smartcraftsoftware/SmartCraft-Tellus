@@ -20,30 +20,30 @@ public class CompanyController : ControllerBase
         _companyService = service;
     }
     /// <summary>
-    /// Gets a tenant
+    /// Gets a company
     /// </summary>
     /// <param name="tenantId"></param>
     /// <param name="companyId"></param>
-    /// <returns>A tenant object</returns>
-    /// <response code="200">Returns a tenant</response>
-    /// <response code="404">Could not find specified tenant</response>
+    /// <returns>A company object</returns>
+    /// <response code="200">Returns a company</response>
+    /// <response code="404">Could not find specified company</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("{companyId}")]
     public async Task<ActionResult<GetCompanyResponse>> Get([FromHeader]Guid tenantId, Guid companyId)
     {
         try
         {
-            var tenant = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if(tenant == null)
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+            if(company == null)
             {
                 return NotFound("Could not find company.");
             }
 
-            return Ok(tenant);
+            return Ok(company);
         }
         catch (Exception ex)
         {
-            _logger.Error("Error getting {Tenant} with {ErrorMessage}", tenantId, ex.Message);
+            _logger.Error("Error getting {company} with {ErrorMessage}", companyId, ex.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -51,17 +51,17 @@ public class CompanyController : ControllerBase
     /// <summary>
     /// Creates a Company
     /// </summary>
-    /// <param name="tenantRequest"></param>
+    /// <param name="companyRequest"></param>
     /// <param name="tenantId"></param>
     /// <returns>Ok result</returns>
-    /// <response code="200">Tenant has been created</response>
+    /// <response code="200">Company has been created</response>
     /// <response code="500">Internal server error</response>
     [HttpPost]
-    public async Task<ActionResult<Guid>> Post([FromHeader]Guid tenantId, [FromBody]AddCompanyRequest tenantRequest)
+    public async Task<ActionResult<Guid>> Post([FromHeader]Guid tenantId, [FromBody]AddCompanyRequest companyRequest)
     {
         try
         {
-            return Ok(await _companyService.RegisterCompanyAsync(tenantId, tenantRequest.ToDomainModel()));
+            return Ok(await _companyService.RegisterCompanyAsync(tenantId, companyRequest.ToDomainModel()));
         }
         catch (Exception ex)
         {
@@ -71,20 +71,26 @@ public class CompanyController : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing tenant
+    /// Updates an existing company
     /// </summary>
     /// <param name="tenantId"></param>
+    /// <param name="companyId"></param>
     /// <param name="companyRequest"></param>
     /// <returns>Ok result</returns>
-    /// <response code="200">Tenant has been updated</response>
+    /// <response code="200">Company has been updated</response>
     /// <response code="500">Internal server error</response>
-    [HttpPatch]
-    public async Task<ActionResult> Patch([FromHeader]Guid tenantId, [FromBody]UpdateCompanyRequest companyRequest)
+    [HttpPatch("{companyId}")]
+    public async Task<ActionResult> Patch([FromHeader]Guid tenantId, Guid companyId, [FromBody]UpdateCompanyRequest companyRequest)
     {
         try
         {
-            var companyToUpdate = companyRequest.ToDomainModel();
-            var updatedCompany = await _companyService.UpdateCompanyAsync(tenantId, companyToUpdate);
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
+            {
+                return NotFound("Could not find company.");
+            }
+            var companyUpdateValues = companyRequest.ToDomainModel(companyId);
+            var updatedCompany = await _companyService.UpdateCompanyAsync(tenantId, companyUpdateValues);
             return Ok(updatedCompany);
         }
         catch (Exception ex)
@@ -95,16 +101,16 @@ public class CompanyController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a tenant
+    /// Deletes a company
     /// </summary>
     /// <param name="tenantId"></param>
     /// <param name="companyId"></param>
     /// <returns>No content result</returns>
-    /// <response code="204">Tenant has been deleted</response>
-    /// <response code="404">Could not find specified tenant</response>
+    /// <response code="204">Company has been deleted</response>
+    /// <response code="404">Could not find specified Company</response>
     /// <response code="500">Internal server error</response>
-    [HttpDelete]
-    public async Task<ActionResult> Delete([FromHeader] Guid tenantId, Guid companyId)
+    [HttpDelete("{companyId}")]
+    public async Task<ActionResult> Delete([FromHeader]Guid tenantId, Guid companyId)
     {
         try
         {
@@ -122,7 +128,7 @@ public class CompanyController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error deleting {Tenant} with {ErrorMessage}", tenantId, ex);
+            _logger.Error("Error deleting {Company} with {ErrorMessage}", companyId, ex);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }

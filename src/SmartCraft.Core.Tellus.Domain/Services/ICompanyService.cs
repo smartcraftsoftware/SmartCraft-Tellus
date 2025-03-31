@@ -4,9 +4,9 @@ namespace SmartCraft.Core.Tellus.Domain.Services;
 
 public interface ICompanyService
 {
-	Task<Guid> RegisterCompanyAsync(Guid tenantId, Company tenant);
+	Task<Guid> RegisterCompanyAsync(Guid tenantId, Company company);
 	Task<Company?> GetCompanyAsync(Guid companyId, Guid tenantId);
-	Task<List<Company>> GetCompaniesAsync();
-	Task<Company> UpdateCompanyAsync(Guid id, Company tenant);
-	Task<bool> DeleteCompany(Guid id);
+    Task<List<Company>> GetCompaniesAsync();
+	Task<Company> UpdateCompanyAsync(Guid id, Company company);
+    Task<bool> DeleteCompany(Guid id);
 }

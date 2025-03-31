@@ -56,14 +56,14 @@ public class companyServiceTest
     public async Task RegistercompanyAsync_Success_ReturnsGuid()
     {
         //Arrange
-        var company = new Infrastructure.Models.Company()
+        var company = new Domain.Models.Company()
         {
             Id = Guid.NewGuid(),
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
         //Act
-        var result = await service.RegisterCompanyAsync(company.Id, company.ToDomainModel());
+        var result = await service.RegisterCompanyAsync(company.Id, company);
 
         //Assert
         Assert.Equal(company.Id, result);

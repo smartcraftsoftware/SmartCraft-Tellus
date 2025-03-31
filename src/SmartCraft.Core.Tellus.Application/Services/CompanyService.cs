@@ -17,7 +17,6 @@ public class CompanyService(IRepository<Infrastructure.Models.Company, CompanyCo
             return null;
         return company.ToDomainModel();
     }
-
     public async Task<List<Company>> GetCompaniesAsync()
     {
         var companies = await repository.GetAll();
@@ -33,7 +32,7 @@ public class CompanyService(IRepository<Infrastructure.Models.Company, CompanyCo
 
     public async Task<Company> UpdateCompanyAsync(Guid id, Company company)
     {
-        var existingCompany = await repository.Get(id);
+        var existingCompany = await repository.Get(company.Id);
         if (existingCompany == null)
         {
             throw new InvalidOperationException("TenantCompany not found");

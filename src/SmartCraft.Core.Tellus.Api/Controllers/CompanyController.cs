@@ -8,6 +8,8 @@ using ILogger = Serilog.ILogger;
 
 namespace SmartCraft.Core.Tellus.Api.Controllers;
 
+//Test commit pipeline
+
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:ApiVersion}/[controller]")]

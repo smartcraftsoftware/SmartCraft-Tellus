@@ -4,6 +4,7 @@ using SmartCraft.Core.Tellus.Api.Contracts.Requests;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Mappers;
 using SmartCraft.Core.Tellus.Domain.Services;
+using ILogger = Serilog.ILogger;
 
 namespace SmartCraft.Core.Tellus.Api.Controllers;
 
@@ -12,9 +13,9 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [Route("api/v{version:ApiVersion}/[controller]")]
 public class CompanyController : ControllerBase
 {
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly ICompanyService _companyService;
-    public CompanyController(Serilog.ILogger logger, ICompanyService service)
+    public CompanyController(ILogger logger, ICompanyService service)
     {
         _logger = logger.ForContext<CompanyController>();
         _companyService = service;
@@ -43,8 +44,8 @@ public class CompanyController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error getting {company} with {ErrorMessage}", companyId, ex.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            _logger.Error("Error getting {Company} with {Exception}", companyId, ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -65,8 +66,8 @@ public class CompanyController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error creating tenant with {ErrorMessage}", ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            _logger.Error("Error creating tenant with {Exception}", ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -90,13 +91,13 @@ public class CompanyController : ControllerBase
                 return NotFound("Could not find company.");
             }
             var companyUpdateValues = companyRequest.ToDomainModel(companyId);
-            var updatedCompany = await _companyService.UpdateCompanyAsync(tenantId, companyUpdateValues);
+            var updatedCompany = await _companyService.UpdateCompanyAsync(companyUpdateValues);
             return Ok(updatedCompany);
         }
         catch (Exception ex)
         {
             _logger.Error( "Error updating Company with {Exception}", ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -128,8 +129,8 @@ public class CompanyController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error deleting {Company} with {ErrorMessage}", companyId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            _logger.Error("Error deleting {Company} with {Exception}", companyId, ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 }

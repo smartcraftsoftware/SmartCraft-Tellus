@@ -6,7 +6,7 @@ using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 
 namespace SmartCraft.Core.Tellus.Application.Services;
 
-public class CompanyService(IRepository<Infrastructure.Models.Company, CompanyContext> repository) : ICompanyService
+public class CompanyService(ICompanyRepository<Infrastructure.Models.Company, CompanyContext> repository) : ICompanyService
 {
     public async Task<Company?> GetCompanyAsync(Guid companyId, Guid tenantId)
     {
@@ -17,9 +17,9 @@ public class CompanyService(IRepository<Infrastructure.Models.Company, CompanyCo
             return null;
         return company.ToDomainModel();
     }
-    public async Task<List<Company>> GetCompaniesAsync()
+    public async Task<List<Company>> GetCompaniesAsync(Guid tenantId)
     {
-        var companies = await repository.GetAll();
+        var companies = await repository.GetAll(tenantId);
         return companies.Select(x => x.ToDomainModel()).ToList();
     }
 
@@ -30,7 +30,7 @@ public class CompanyService(IRepository<Infrastructure.Models.Company, CompanyCo
         return companyToAdd.Id;
     }
 
-    public async Task<Company> UpdateCompanyAsync(Guid id, Company company)
+    public async Task<Company> UpdateCompanyAsync(Company company)
     {
         var existingCompany = await repository.Get(company.Id);
         if (existingCompany == null)

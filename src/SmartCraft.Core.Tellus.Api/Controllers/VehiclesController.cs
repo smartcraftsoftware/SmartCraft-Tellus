@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Mappers;
 using SmartCraft.Core.Tellus.Domain.Services;
-using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace SmartCraft.Core.Tellus.Api.Controllers;
 
@@ -16,16 +16,16 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [Produces("application/json")]
 public class VehiclesController : ControllerBase
 {
-    private Serilog.ILogger _logger;
+    private ILogger _logger;
     private readonly IVehiclesService _vehicleService;
     private readonly IEsgService _esgService;
-    private readonly ICompanyService _tenantService;
-    public VehiclesController(Serilog.ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ICompanyService tenantService)
+    private readonly ICompanyService _companyService;
+    public VehiclesController(ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ICompanyService companyService)
     {
         _logger = logger.ForContext<VehiclesController>();
         _vehicleService = vehicleService;
         _esgService = esgService;
-        _tenantService = tenantService;
+        _companyService = companyService;
     }
     /// <summary>
     /// Gets a list of vehicles in current users' fleet, based on the vehicle brand
@@ -43,7 +43,7 @@ public class VehiclesController : ControllerBase
     {
         try
         {
-            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
             if (company == null)
             {
                 return NotFound("Could not find tenant");
@@ -58,8 +58,8 @@ public class VehiclesController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error getting vehicles for tenant {tenantId} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            _logger.Error("Error getting vehicles for tenant {tenantId} with {Exception}", tenantId, ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -82,7 +82,7 @@ public class VehiclesController : ControllerBase
     {
         try
         {
-            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
             if (company == null)
             {
                 return NotFound("Could not find tenant");
@@ -98,7 +98,7 @@ public class VehiclesController : ControllerBase
         catch (Exception ex)
         {
             _logger.Error("Error getting report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -120,7 +120,7 @@ public class VehiclesController : ControllerBase
     {
         try
         {
-            var company = await _tenantService.GetCompanyAsync(companyId, tenantId);
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
             if (company == null)
             {
                 return NotFound("Could not find tenant");
@@ -132,12 +132,12 @@ public class VehiclesController : ControllerBase
         catch (HttpRequestException ex)
         {
             _logger.Error("The vehicle client threw an HTTP request {Exception}", ex);
-            return StatusCode((int)ex.StatusCode, ex.Message);
+            return StatusCode((int)ex.StatusCode, "An error occured when making the request");
         }
         catch (Exception ex)
         {
             _logger.Error("Error getting vehicle status report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 }

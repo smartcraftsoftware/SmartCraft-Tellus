@@ -7,11 +7,11 @@ using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 namespace SmartCraft.Core.Tellus.Test.Service;
 public class companyServiceTest
 {
-    public Mock<IRepository<Infrastructure.Models.Company, CompanyContext>> repositoryMock;
+    public Mock<ICompanyRepository<Infrastructure.Models.Company, CompanyContext>> repositoryMock;
     CompanyService service;
     public companyServiceTest()
     {
-        repositoryMock = new Mock<IRepository<Infrastructure.Models.Company, CompanyContext>>();
+        repositoryMock = new Mock<ICompanyRepository<Infrastructure.Models.Company, CompanyContext>>();
         service = new CompanyService(repositoryMock.Object);
     }
 
@@ -58,15 +58,14 @@ public class companyServiceTest
         //Arrange
         var company = new Domain.Models.Company()
         {
-            Id = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
         //Act
-        var result = await service.RegisterCompanyAsync(company.Id, company);
+        var result = await service.RegisterCompanyAsync(company.TenantId, company);
 
         //Assert
-        Assert.Equal(company.Id, result);
         repositoryMock.Verify(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Once);
     }
 
@@ -106,7 +105,7 @@ public class companyServiceTest
         repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ReturnsAsync(updatedcompany);
 
         //Act
-        var result = await service.UpdateCompanyAsync(companyId, company);
+        var result = await service.UpdateCompanyAsync(company);
 
         //Assert
         Assert.Equal(updatedcompany.Id, result.Id);
@@ -124,7 +123,7 @@ public class companyServiceTest
         repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
 
         //Act and Assert
-        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateCompanyAsync(Guid.NewGuid(), new Domain.Models.Company()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateCompanyAsync(new Domain.Models.Company()));
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Never);
     }

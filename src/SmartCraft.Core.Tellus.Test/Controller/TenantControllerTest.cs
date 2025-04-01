@@ -107,7 +107,7 @@ public class CompanyControllerTest
         {
             VolvoCredentials = "okokok"
         };
-        companyServiceMock.Setup(x => x.UpdateCompanyAsync(tenantId, It.IsAny<Company>())).ReturnsAsync(new Company { Id = companyId});
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Company>())).ReturnsAsync(new Company { Id = companyId});
         companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId });
 
         //Act
@@ -115,7 +115,7 @@ public class CompanyControllerTest
 
         //Assert
         Assert.IsType<OkObjectResult>(result);
-        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]
@@ -124,11 +124,11 @@ public class CompanyControllerTest
         //Arrange
         var controller = CreateController();
         companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid() });
-        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act & Assert
         var result = await controller.Patch(Guid.NewGuid(), Guid.NewGuid(), new UpdateCompanyRequest()).ShouldThrowAsync<Exception>();
-        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
+        companyServiceMock.Verify(companyServiceMock => companyServiceMock.UpdateCompanyAsync(It.IsAny<Company>()), Times.Once);
     }
 
     [Fact]

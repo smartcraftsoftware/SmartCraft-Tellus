@@ -9,6 +9,7 @@ public static class CompanyMapper
     {
         return new GetCompanyResponse
         {
+            CompanyId = company.Id,
             TenantId = company.TenantId,
             DaimlerToken = company.DaimlerToken,
             ManToken = company.ManToken,

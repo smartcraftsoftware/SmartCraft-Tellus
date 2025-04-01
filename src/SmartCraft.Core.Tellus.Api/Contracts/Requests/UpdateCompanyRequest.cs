@@ -2,7 +2,6 @@
 
 public class UpdateCompanyRequest
 {
-    public Guid Id { get; set; }
     public string? VolvoCredentials { get; set; }
     public string? ScaniaClientId { get; set; }
     public string? ScaniaSecretKey { get; set; }

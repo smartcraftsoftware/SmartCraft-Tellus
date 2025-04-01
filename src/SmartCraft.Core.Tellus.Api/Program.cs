@@ -3,6 +3,7 @@ using SmartCraft.Core.Tellus.Domain.Repositories;
 using SmartCraft.Core.Tellus.Application.Services;
 using SmartCraft.Core.Tellus.Domain.Services;
 using SmartCraft.Core.Tellus.Infrastructure.Repositories;
+using SmartCraft.Core.Tellus.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using SmartCraft.Core.Tellus.Infrastructure.Context;
 using SmartCraft.Core.Tellus.Infrastructure.Client;
@@ -12,7 +13,6 @@ using System.Reflection;
 using Microsoft.OpenApi.Models;
 using SmartCraft.Core.Tellus.Domain.Validators;
 using Serilog;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 var Configuration = builder.Configuration;
@@ -108,11 +108,11 @@ builder.Services.AddScoped<CompanyContext>();
 builder.Services.AddScoped<VehicleContext>();
 
 //Repositories
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.EsgVehicleReport, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Vehicle, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.StatusReport, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.IntervalStatusReport, VehicleContext>>();
-builder.Services.AddScoped<IRepository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, CompanyContext>, Repository<SmartCraft.Core.Tellus.Infrastructure.Models.Company, CompanyContext>>();
+builder.Services.AddScoped<IRepository<EsgVehicleReport, VehicleContext>, Repository<EsgVehicleReport, VehicleContext>>();
+builder.Services.AddScoped<IRepository<Vehicle, VehicleContext>, Repository<Vehicle, VehicleContext>>();
+builder.Services.AddScoped<IRepository<StatusReport, VehicleContext>, Repository<StatusReport, VehicleContext>>();
+builder.Services.AddScoped<IRepository<IntervalStatusReport, VehicleContext>, Repository<IntervalStatusReport, VehicleContext>>();
+builder.Services.AddScoped<ICompanyRepository<Company, CompanyContext>, CompanyRepository>();
 
 
 var app = builder.Build();

@@ -5,10 +5,10 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Context;
 
 public class CompanyContext : DbContext
 {
-	public CompanyContext(DbContextOptions<CompanyContext> options) : base(options)
-	{
+    public CompanyContext(DbContextOptions<CompanyContext> options) : base(options)
+    {
 
-	}
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,5 +20,4 @@ public class CompanyContext : DbContext
     }
 
     public DbSet<Company> Companies { get; set; }
-    public DbSet<Tenant> Tenants { get; set; }
 }

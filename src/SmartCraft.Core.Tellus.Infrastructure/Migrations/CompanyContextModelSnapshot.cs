@@ -65,44 +65,6 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
 
                     b.ToTable("Companies");
                 });
-
-            modelBuilder.Entity("SmartCraft.Core.Tellus.Infrastructure.Models.Tenant", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DaimlerToken")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("LastUpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ManToken")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ScaniaClientId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ScaniaSecretKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("VolvoCredentials")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tenants");
-                });
 #pragma warning restore 612, 618
         }
     }

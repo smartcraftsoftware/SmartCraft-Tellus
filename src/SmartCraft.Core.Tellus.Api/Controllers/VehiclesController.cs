@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Mappers;
 using SmartCraft.Core.Tellus.Domain.Services;
-using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace SmartCraft.Core.Tellus.Api.Controllers;
 
@@ -16,16 +16,16 @@ namespace SmartCraft.Core.Tellus.Api.Controllers;
 [Produces("application/json")]
 public class VehiclesController : ControllerBase
 {
-    private Serilog.ILogger _logger;
+    private ILogger _logger;
     private readonly IVehiclesService _vehicleService;
     private readonly IEsgService _esgService;
-    private readonly ITenantService _tenantService;
-    public VehiclesController(Serilog.ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ITenantService tenantService)
+    private readonly ICompanyService _companyService;
+    public VehiclesController(ILogger logger, IVehiclesService vehicleService, IEsgService esgService, ICompanyService companyService)
     {
         _logger = logger.ForContext<VehiclesController>();
         _vehicleService = vehicleService;
         _esgService = esgService;
-        _tenantService = tenantService;
+        _companyService = companyService;
     }
     /// <summary>
     /// Gets a list of vehicles in current users' fleet, based on the vehicle brand
@@ -33,22 +33,23 @@ public class VehiclesController : ControllerBase
     /// <param name="vehicleBrand"></param>
     /// <param name="vin"></param>
     /// <param name="tenantId"></param>
+    /// <param name="companyId"></param>
     /// <returns>A list of vehicle objects</returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/vehicles")]
-    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId)
+    [HttpGet("{companyId}/{vehicleBrand}/vehicles")]
+    public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId, Guid companyId)
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
 
-            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, tenant);
+            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, company);
             if (vehicles == null || vehicles.Count == 0)
                 return NoContent();
 
@@ -57,8 +58,8 @@ public class VehiclesController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error("Error getting vehicles for tenant {tenantId} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            _logger.Error("Error getting vehicles for tenant {tenantId} with {Exception}", tenantId, ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -71,21 +72,22 @@ public class VehiclesController : ControllerBase
     /// <param name="startTime">Start time of interval (yyyy-MM-dd)</param>
     /// <param name="stopTime">Stop time of interval (yyyy-MM-dd)</param>
     /// <param name="tenantId">Id of tenant</param>
+    /// <param name="companyId"></param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/report")]
-    public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId)
+    [HttpGet("{companyId}/{vehicleBrand}/report")]
+    public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId)
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
-            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
             if (vehicle == null)
             {
                 return NoContent();
@@ -96,7 +98,7 @@ public class VehiclesController : ControllerBase
         catch (Exception ex)
         {
             _logger.Error("Error getting report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 
@@ -108,33 +110,34 @@ public class VehiclesController : ControllerBase
     /// <param name="startTime">Start time of interval (yyyy-MM-dd hh:mm:ss)</param>
     /// <param name="stopTime">Stop time of interval (yyyy-MM-dd hh:mm:ssZ)</param>
     /// <param name="tenantId">Stop time of interval (yyyy-MM-dd hh:mm:ssZ)</param>
+    /// <param name="companyId"></param>
     /// <returns></returns>
     /// <response code="200">Returns a vehicle status report</response>
     /// <response code="404">Could not find vehicle</response>
     /// <response code="500">Internal server error</response>
-    [HttpGet("{vehicleBrand}/vehiclestatus")]
-    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, string vinOrId = "")
+    [HttpGet("{companyId}/{vehicleBrand}/vehiclestatus")]
+    public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId, string vinOrId = "")
     {
         try
         {
-            var tenant = await _tenantService.GetTenantAsync(tenantId);
-            if (tenant == null)
+            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+            if (company == null)
             {
                 return NotFound("Could not find tenant");
             }
 
-            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, tenant, startTime, stopTime);
+            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
             return Ok(statusReport.ToIntervalRespone());
         }
         catch (HttpRequestException ex)
         {
             _logger.Error("The vehicle client threw an HTTP request {Exception}", ex);
-            return StatusCode((int)ex.StatusCode, ex.Message);
+            return StatusCode((int)ex.StatusCode, "An error occured when making the request");
         }
         catch (Exception ex)
         {
             _logger.Error("Error getting vehicle status report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
         }
     }
 }

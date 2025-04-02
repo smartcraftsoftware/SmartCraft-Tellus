@@ -11,7 +11,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 {
     public string VehicleBrand => "volvo";
 
-    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<EsgVehicleReport> GetEsgReportAsync(string? vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         var uriBuilder = !string.IsNullOrEmpty(vin) ?
             ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/score/scores", $"vin={vin}&starttime={startTime:yyyy-MM-dd}&stoptime={stopTime:yyyy-MM-dd}") :
@@ -46,7 +46,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         return jsonObject.ToDomainModel();
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(Tenant tenant, string? vin)
+    public async Task<List<Vehicle>> GetVehiclesAsync(Company tenant, string? vin)
     {
         var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehicles");
         var credentials = tenant?.VolvoCredentials ?? "";
@@ -77,7 +77,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
             PropertyNameCaseInsensitive = true
         };
 
-        var vehicleApiResponse = JsonSerializer.Deserialize<VolvoVehiclesApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
+        var vehicleApiResponse = JsonSerializer.Deserialize<VolvoVehiclesApiResponse>(await response.Content.ReadAsStringAsync(), options) ?? throw new JsonException();
 
         var vehicles = vehicleApiResponse.Vehicle?.ToList() ?? new List<VolvoVehicleResponse>();
 
@@ -86,7 +86,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         : vehicles.Select(v => v.ToDomainModel()).ToList();
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Tenant tenant, DateTime startTime, DateTime stopTime) {
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime) {
 
         TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)
@@ -97,8 +97,9 @@ public class VolvoClient(HttpClient client) : IVehicleClient
             { "vin", vin },
             { "starttime", startTime.ToIso8601() },
             { "stoptime", stopTime.ToIso8601() },
-            { "triggerFilter", "TIMER" },
-            { "contentFilter", "SNAPSHOT" },
+            { "latestOnly", "false" },
+            { "TriggerFilter", "TIMER" },
+            { "ContentFilter", "ACCUMULATED" },
             { "datetype", "received" }
         };
 
@@ -124,16 +125,23 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
         response.EnsureSuccessStatusCode();
         string responseContent = await response.Content.ReadAsStringAsync();
-        var vehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+        var vehicleStatusResponse = JsonSerializer.Deserialize<VolvoVehicleStatusResponse>(responseContent, options)
+                                    ?? throw new JsonException("Could not deserialize response");
+
         if (vehicleStatusResponse.MoreDataAvailable && vehicleStatusResponse?.VehicleStatus?.Length > 0)
         {
             bool moreDataAvailable = true;
             while (moreDataAvailable)
             {
                 var latest = vehicleStatusResponse.VehicleStatus[^1];
-                #pragma warning disable CS8629 // Nullable value type may be null.
+#pragma warning disable CS8629 // Nullable value type may be null.
                 DateTime latestDate = (DateTime)latest.ReceivedDateTime;
-                #pragma warning restore CS8629 // Nullable value type may be null.
+#pragma warning restore CS8629 // Nullable value type may be null.
                 latestDate = latestDate.AddSeconds(1);
                 param["starttime"] = latestDate.ToIso8601();
                 uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehiclestatuses", param);
@@ -145,7 +153,6 @@ public class VolvoClient(HttpClient client) : IVehicleClient
                 moreDataAvailable = newVehicleStatusResponse.MoreDataAvailable;
             }
         }
-
         return vehicleStatusResponse.ToIntervalDomainModel();
     }
 

@@ -25,16 +25,16 @@ public class VehiclesService : IVehiclesService
         clientDictionary = _clients.ToDictionary(x => x.VehicleBrand, x => x);
     }
 
-    public async Task<List<Vehicle>> GetVehiclesAsync(string vehicleBrand, string? vin, Tenant tenant)
+    public async Task<List<Vehicle>> GetVehiclesAsync(string vehicleBrand, string? vin, Company company)
     {
         if (!MatchKeyvalue(vehicleBrand.ToLower()))
             throw new KeyNotFoundException($"Vehicle brand {vehicleBrand} not found");
 
-        var vehicles = await clientDictionary[vehicleBrand.ToLower()].GetVehiclesAsync(tenant, vin);
+        var vehicles = await clientDictionary[vehicleBrand.ToLower()].GetVehiclesAsync(company, vin);
         return vehicles;
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Tenant tenant, DateTime startTime, DateTime stopTime)
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vehicleBrand, string vin, Company tenant, DateTime startTime, DateTime stopTime)
     {
         (var start, var stop) = ParseAndMatchDateTimeValues(startTime, stopTime);
 

@@ -6,7 +6,7 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Repositories;
 
 public class Repository<TEntity, TContext> : IRepository<TEntity, TContext> where TEntity : BaseDbModel where TContext : DbContext
 {
-    private readonly DbSet<TEntity> _entities;
+    protected readonly DbSet<TEntity> _entities;
     private readonly TContext _context;
  
     public Repository(TContext context)

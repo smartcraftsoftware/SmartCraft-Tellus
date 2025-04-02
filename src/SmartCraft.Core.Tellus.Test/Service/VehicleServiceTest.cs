@@ -26,13 +26,13 @@ public class VehicleServiceTest
     public async Task GetVehicleStatusAsync_Returns_StatusReport(string vehicleBrand)
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         var vin = "thisisvin";
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
           .ReturnsAsync(new IntervalStatusReport() { Vin = vin });
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 
@@ -50,12 +50,12 @@ public class VehicleServiceTest
     public void GetVehicleStatusAsync_Returns_UnsuccessfulResponseStatusCode(string vehicleBrand)
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException());
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException());
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
        
         // Assert and Act
@@ -68,12 +68,12 @@ public class VehicleServiceTest
     public void GetVechicleStatusAsync_Throws_Json_Exception(string vehicleBrand)
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new JsonException());
+        _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new JsonException());
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 
 
@@ -87,13 +87,13 @@ public class VehicleServiceTest
     public async Task GetFleetAsync_Returns_ListOfVehicles(string vehicleBrand)
     {
         // Arrange
-        Tenant tenant = new Tenant
+        Company tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        _vehicleClientMock.Setup(x => x.GetVehiclesAsync(It.IsAny<Tenant>(), null))
+        _vehicleClientMock.Setup(x => x.GetVehiclesAsync(It.IsAny<Company>(), null))
                   .ReturnsAsync([new() { Vin = "thisisvin" }]);
         VehiclesService _vehiclesService = new VehiclesService(_vehiclesRepositoryMock.Object, _statusRepositoryMock.Object, new List<IVehicleClient> { _vehicleClientMock.Object });
 

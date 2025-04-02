@@ -4,15 +4,22 @@ info:
   description: 'API to access real-world data from trucks. More info: [here](https://github.com/smartcraftsoftware/SmartCraft-Tellus/blob/main/GETTING-STARTED.md)'
   version: v1
 paths:
-  '/api/v{version}/Tenants':
+  '/api/v{version}/Company/{companyId}':
     get:
       tags:
-        - Tenants
-      summary: Gets a tenant
+        - Company
+      summary: Gets a company
       parameters:
         - name: tenantId
           in: header
           description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
           schema:
             type: string
             format: uuid
@@ -23,75 +30,36 @@ paths:
             type: string
       responses:
         '200':
-          description: Returns a tenant
+          description: Returns a company
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/GetTenantResponse'
+                $ref: '#/components/schemas/GetCompanyResponse'
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTenantResponse'
+                $ref: '#/components/schemas/GetCompanyResponse'
             text/json:
               schema:
-                $ref: '#/components/schemas/GetTenantResponse'
+                $ref: '#/components/schemas/GetCompanyResponse'
         '404':
-          description: Could not find specified tenant
-        '500':
-          description: Internal server error
-    post:
-      tags:
-        - Tenants
-      summary: Creates a tenant
-      parameters:
-        - name: tenantId
-          in: header
-          description: ''
-          schema:
-            type: string
-            format: uuid
-        - name: version
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddTenantRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/AddTenantRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/AddTenantRequest'
-      responses:
-        '200':
-          description: Tenant has been created
-          content:
-            text/plain:
-              schema:
-                type: string
-                format: uuid
-            application/json:
-              schema:
-                type: string
-                format: uuid
-            text/json:
-              schema:
-                type: string
-                format: uuid
+          description: Could not find specified company
         '500':
           description: Internal server error
     patch:
       tags:
-        - Tenants
-      summary: Updates an existing tenant
+        - Company
+      summary: Updates an existing company
       parameters:
         - name: tenantId
           in: header
           description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
           schema:
             type: string
             format: uuid
@@ -105,26 +73,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
+              $ref: '#/components/schemas/UpdateCompanyRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
+              $ref: '#/components/schemas/UpdateCompanyRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/UpdateTenantRequest'
+              $ref: '#/components/schemas/UpdateCompanyRequest'
       responses:
         '200':
-          description: Tenant has been updated
+          description: Company has been updated
         '500':
           description: Internal server error
     delete:
       tags:
-        - Tenants
-      summary: Deletes a tenant
+        - Company
+      summary: Deletes a company
       parameters:
         - name: tenantId
           in: header
           description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
           schema:
             type: string
             format: uuid
@@ -137,12 +112,59 @@ paths:
         '200':
           description: OK
         '204':
-          description: Tenant has been deleted
+          description: Company has been deleted
         '404':
-          description: Could not find specified tenant
+          description: Could not find specified Company
         '500':
           description: Internal server error
-  '/api/v{version}/Vehicles/{vehicleBrand}/vehicles':
+  '/api/v{version}/Company':
+    post:
+      tags:
+        - Company
+      summary: Creates a Company
+      parameters:
+        - name: tenantId
+          in: header
+          description: ''
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCompanyRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AddCompanyRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AddCompanyRequest'
+      responses:
+        '200':
+          description: Company has been created
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+            application/json:
+              schema:
+                type: string
+                format: uuid
+            text/json:
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal server error
+  '/api/v{version}/Vehicles/{companyId}/{vehicleBrand}/vehicles':
     get:
       tags:
         - Vehicles
@@ -165,6 +187,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: version
           in: path
           required: true
@@ -183,7 +212,7 @@ paths:
           description: Could not find vehicle
         '500':
           description: Internal server error
-  '/api/v{version}/Vehicles/{vehicleBrand}/report':
+  '/api/v{version}/Vehicles/{companyId}/{vehicleBrand}/report':
     get:
       tags:
         - Vehicles
@@ -218,6 +247,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: version
           in: path
           required: true
@@ -234,7 +270,7 @@ paths:
           description: Could not find vehicle
         '500':
           description: Internal server error
-  '/api/v{version}/Vehicles/{vehicleBrand}/vehiclestatus':
+  '/api/v{version}/Vehicles/{companyId}/{vehicleBrand}/vehiclestatus':
     get:
       tags:
         - Vehicles
@@ -264,6 +300,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: companyId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: vinOrId
           in: query
           description: Vin number or external id of vehicle.
@@ -288,9 +331,12 @@ paths:
           description: Internal server error
 components:
   schemas:
-    AddTenantRequest:
+    AddCompanyRequest:
       type: object
       properties:
+        tenantId:
+          type: string
+          format: uuid
         volvoCredentials:
           type: string
           nullable: true
@@ -307,9 +353,15 @@ components:
           type: string
           nullable: true
       additionalProperties: false
-    GetTenantResponse:
+    GetCompanyResponse:
       type: object
       properties:
+        companyId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
         daimlerToken:
           type: string
           nullable: true
@@ -428,7 +480,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    UpdateTenantRequest:
+    UpdateCompanyRequest:
       type: object
       properties:
         volvoCredentials:

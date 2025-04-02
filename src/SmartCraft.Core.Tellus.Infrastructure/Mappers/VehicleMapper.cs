@@ -211,12 +211,12 @@ public static class VehicleMapper
         // sort statusResponse VehicleStatus by received date, just in case
         var vehicleStatuses = statusResponse?.VehicleStatus?.OrderBy(x => x.CreatedDateTime).ToArray();
         if (vehicleStatuses?.Length == 0)
-            throw new InvalidOperationException("Statusresponse is empty");
+            return new IntervalStatusReport();
 
         var vin = vehicleStatuses?[0].Vin ?? string.Empty;
 
-        var first = vehicleStatuses?[0];
-        var last = vehicleStatuses?[^1];
+        var first = vehicleStatuses?.FirstOrDefault();
+        var last = vehicleStatuses?.LastOrDefault();
 
         DateTime firstDate = first?.CreatedDateTime ?? throw new InvalidOperationException();
         DateTime lastDate = last?.CreatedDateTime ?? throw new InvalidOperationException();

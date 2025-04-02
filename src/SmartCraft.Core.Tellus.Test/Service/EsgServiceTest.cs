@@ -18,12 +18,12 @@ public class EsgServiceTest
     public async Task Get_EsgReportAsync_ReturnsReport(string vehicleBrand)
     {
         //Arrange
-        var tenant = new Tenant
+        var tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync(new EsgVehicleReport() { StartTime = DateTime.UtcNow.AddDays(-3), StopTime = DateTime.UtcNow,  VehicleEvaluations = [] });
         var esgService = CreateService();
 
@@ -51,12 +51,12 @@ public class EsgServiceTest
     public async Task Get_EsgReport_InvalidDateTimes_ThrowsInvalidOperationException(string vehicleBrand, DateTime startTime, DateTime stopTime)
     {
         //Arrange
-        var tenant = new Tenant
+        var tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync(new EsgVehicleReport() { VehicleEvaluations = [] });
 
         var esgService = CreateService();
@@ -66,7 +66,7 @@ public class EsgServiceTest
 
         //Assert
         var exception = await act.Should().ThrowAsync<InvalidOperationException>();
-        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        vehicleClientMock.Verify(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
 
     }
 
@@ -76,12 +76,12 @@ public class EsgServiceTest
     public async Task Get_EsgReport_Fails_ReturnsNull(string vehicleBrand) 
     {
         //Arrange
-        var tenant = new Tenant
+        var tenant = new Company
         {
             Id = Guid.NewGuid()
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
-        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .ReturnsAsync(null as EsgVehicleReport);
 
         var esgService = CreateService();

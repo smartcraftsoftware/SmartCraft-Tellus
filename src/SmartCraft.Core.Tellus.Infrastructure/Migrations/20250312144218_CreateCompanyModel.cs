@@ -45,7 +45,7 @@ namespace SmartCraft.Core.Tellus.Infrastructure.Migrations
                 SELECT 
                     gen_random_uuid(), ""Id"", ""VolvoCredentials"", ""ScaniaClientId"", ""ScaniaSecretKey"", 
                     ""ManToken"", ""DaimlerToken"", NOW(), NOW(), ""Id"", ""Id""
-                FROM ""tenants"";
+                FROM ""Tenants"";
             ");
 
             migrationBuilder.DropTable(

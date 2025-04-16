@@ -4,11 +4,13 @@ using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
 using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Services;
+using Serilog;
+using Shouldly;
 
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class VehiclesControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<VehiclesController>> loggerMock = new();
+    private readonly Mock<ILogger> loggerMock = new();
     private readonly Mock<IVehiclesService> vehicleServiceMock = new();
     private readonly Mock<IEsgService> esgServiceMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();
@@ -60,14 +62,13 @@ public class VehiclesControllerTest
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
         vehicleServiceMock.Setup(x => x.GetVehiclesAsync(It.IsAny<string>(), null, It.IsAny<Tenant>())).ThrowsAsync(new Exception());
 
-        // Act
-        var result = await controller.GetVehiclesAsync("Volvo", null, Guid.NewGuid());
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(() => controller.GetVehiclesAsync("Volvo", null, Guid.NewGuid()));
 
-        // Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        vehicleServiceMock.Verify(vehicleServiceMock => vehicleServiceMock.GetVehiclesAsync(It.IsAny<string>(), null, It.IsAny<Tenant>()), Times.Once);
+        // Verify
+        tenantServiceMock.Verify(service => service.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        vehicleServiceMock.Verify(service => service.GetVehiclesAsync(It.IsAny<string>(), null, It.IsAny<Tenant>()), Times.Once);
+
     }
 
     [Fact]
@@ -125,7 +126,7 @@ public class VehiclesControllerTest
         var result = await controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
 
         // Assert
-        Assert.IsType<NotFoundObjectResult>(result.Result);
+        Assert.IsType<NoContentResult>(result.Result);
         tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
         esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
     }
@@ -138,14 +139,21 @@ public class VehiclesControllerTest
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ReturnsAsync(new Tenant());
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception());
 
-        // Act
-        var result = await controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid());
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(() =>
+            controller.GetReportAsync("Volvo", "vin", DateTime.UtcNow, DateTime.UtcNow, Guid.NewGuid()));
 
-        // Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
-        esgServiceMock.Verify(esgServiceMock => esgServiceMock.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tenant>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
+        // Verify
+        tenantServiceMock.Verify(service => service.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        esgServiceMock.Verify(service =>
+            service.GetEsgReportAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Tenant>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>()),
+            Times.Once);
+
     }
 
     private VehiclesController CreateVehiclesController()

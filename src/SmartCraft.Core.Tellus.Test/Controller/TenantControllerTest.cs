@@ -5,17 +5,13 @@ using SmartCraft.Core.Tellus.Api.Contracts.Responses;
 using SmartCraft.Core.Tellus.Api.Controllers;
 using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Services;
-using SmartCraft.Core.Tellus.Infrastructure.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Serilog;
+using Shouldly;
 
 namespace SmartCraft.Core.Tellus.Test.Controller;
 public class TenantControllerTest
 {
-    private readonly Mock<Microsoft.Extensions.Logging.ILogger<TenantsController>> loggerMock = new();
+    private readonly Mock<ILogger> loggerMock = new();
     private readonly Mock<ITenantService> tenantServiceMock = new();
 
     [Fact]
@@ -62,13 +58,11 @@ public class TenantControllerTest
         var controller = CreateController();
         tenantServiceMock.Setup(x => x.GetTenantAsync(It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Get(Guid.NewGuid());
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(() => controller.Get(Guid.NewGuid()));
 
-        //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
+        // Verify
+        tenantServiceMock.Verify(service => service.GetTenantAsync(It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
@@ -98,13 +92,12 @@ public class TenantControllerTest
         var controller = CreateController();
         tenantServiceMock.Setup(x => x.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Post(Guid.NewGuid(), new AddTenantRequest());
 
-        //Assert
-        Assert.IsType<ObjectResult>(result.Result);
-        Assert.Equal(500, (result.Result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(() => controller.Post(Guid.NewGuid(), new AddTenantRequest()));
+
+        // Verify
+        tenantServiceMock.Verify(service => service.RegisterTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
     }
 
     [Fact]
@@ -134,13 +127,12 @@ public class TenantControllerTest
         var controller = CreateController();
         tenantServiceMock.Setup(x => x.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Patch(Guid.NewGuid(), new UpdateTenantRequest());
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(() => controller.Patch(Guid.NewGuid(), new UpdateTenantRequest()));
 
-        //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+        // Verify
+        tenantServiceMock.Verify(service => service.UpdateTenantAsync(It.IsAny<Guid>(), It.IsAny<Tenant>()), Times.Once);
+
     }
 
     [Fact]
@@ -181,13 +173,11 @@ public class TenantControllerTest
         var controller = CreateController();
         tenantServiceMock.Setup(x => x.DeleteTenant(It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
-        //Act
-        var result = await controller.Delete(Guid.NewGuid());
+// Act & Assert
+await Should.ThrowAsync<Exception>(() => controller.Delete(Guid.NewGuid()));
 
-        //Assert
-        Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, (result as ObjectResult)?.StatusCode);
-        tenantServiceMock.Verify(tenantServiceMock => tenantServiceMock.DeleteTenant(It.IsAny<Guid>()), Times.Once);
+// Verify
+tenantServiceMock.Verify(service => service.DeleteTenant(It.IsAny<Guid>()), Times.Once);
     }
 
 

@@ -97,8 +97,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
             { "vin", vin },
             { "starttime", startTime.ToIso8601() },
             { "stoptime", stopTime.ToIso8601() },
-            { "triggerFilter", "TIMER" },
-            { "contentFilter", "SNAPSHOT" },
+            { "contentFilter", "ACCUMULATED" },
             { "datetype", "received" }
         };
 

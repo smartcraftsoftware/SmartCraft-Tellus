@@ -50,6 +50,30 @@ public class CompanyController : ControllerBase
     }
 
     /// <summary>
+    /// Gets all companies for a single tenant
+    /// </summary>
+    /// <param name="tenantId"></param>
+    /// <returns></returns>
+    public async Task<ActionResult<List<GetCompanyResponse>>> Get([FromHeader]Guid tenantId)
+    {
+        try
+        {
+            var companies = await _companyService.GetCompaniesAsync(tenantId);
+            if(companies.Count == 0 || companies == null)
+            {
+                return NotFound("Could not find any companies.");
+            }
+
+            return Ok(companies.Select(x => x.ToResponseContract()));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Error getting companies for {Tenant} with {Exception}", tenantId, ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
+        }
+    }
+
+    /// <summary>
     /// Creates a Company
     /// </summary>
     /// <param name="companyRequest"></param>

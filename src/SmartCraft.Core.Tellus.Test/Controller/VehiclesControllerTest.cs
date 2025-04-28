@@ -95,12 +95,13 @@ public class VehiclesControllerTest
 
     [Fact]
     public async Task Get_EsgReport_MissingTenant()
-    {   // Arrange
+    {   
+        // Arrange
         var controller = CreateVehiclesController();
         tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(null as Company);
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new EsgVehicleReport
-            {
+        .ReturnsAsync(new EsgVehicleReport
+        {
             VehicleEvaluations = new()
         });
 

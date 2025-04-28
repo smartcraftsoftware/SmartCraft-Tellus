@@ -28,7 +28,8 @@ public class VehicleServiceTest
         // Arrange
         Company tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         var vin = "thisisvin";
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
@@ -52,7 +53,8 @@ public class VehicleServiceTest
         // Arrange
         Company tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new HttpRequestException());
@@ -70,7 +72,8 @@ public class VehicleServiceTest
         // Arrange
         Company tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.GetVehicleStatusAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new JsonException());
@@ -89,7 +92,8 @@ public class VehicleServiceTest
         // Arrange
         Company tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         _vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);

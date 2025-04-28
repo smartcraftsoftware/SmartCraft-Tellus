@@ -4,6 +4,7 @@ public class GetCompanyResponse
 {
     public Guid CompanyId { get; set; }
     public Guid TenantId { get; set; }
+    public required string Name { get; set; }
     public string? DaimlerToken { get; set; }
     public string? VolvoCredentials { get; set; }
     public string? ScaniaSecretKey { get; set; }

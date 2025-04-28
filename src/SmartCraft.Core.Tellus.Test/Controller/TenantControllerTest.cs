@@ -23,6 +23,7 @@ public class CompanyControllerTest
         var company = new Company
         {
             Id = companyId,
+            Name = "test",
             TenantId = companyId,
             VolvoCredentials = "okokok"
         };
@@ -71,6 +72,7 @@ public class CompanyControllerTest
         var controller = CreateController();
         var companyRequest = new AddCompanyRequest
         {
+            Name = "test",
             VolvoCredentials = "okokok"
         };
         companyServiceMock.Setup(x => x.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ReturnsAsync(Guid.NewGuid());
@@ -92,7 +94,7 @@ public class CompanyControllerTest
         companyServiceMock.Setup(x => x.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act & Assert
-        var result = await controller.Post(Guid.NewGuid(), new AddCompanyRequest()).ShouldThrowAsync<Exception>();
+        var result = await controller.Post(Guid.NewGuid(), new AddCompanyRequest { Name = "test"}).ShouldThrowAsync<Exception>();
         companyServiceMock.Verify(companyServiceMock => companyServiceMock.RegisterCompanyAsync(It.IsAny<Guid>(), It.IsAny<Company>()), Times.Once);
     }
 
@@ -107,8 +109,8 @@ public class CompanyControllerTest
         {
             VolvoCredentials = "okokok"
         };
-        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Company>())).ReturnsAsync(new Company { Id = companyId});
-        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId });
+        companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Company>())).ReturnsAsync(new Company { Id = companyId, Name = "test"});
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId, Name = "test", });
 
         //Act
         var result = await controller.Patch(tenantId, companyId, companyRequest);
@@ -123,7 +125,7 @@ public class CompanyControllerTest
     {
         //Arrange
         var controller = CreateController();
-        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid() });
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid(), Name = "test" });
         companyServiceMock.Setup(x => x.UpdateCompanyAsync(It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         //Act & Assert
@@ -139,7 +141,7 @@ public class CompanyControllerTest
         var tenantId = Guid.NewGuid();
         var companyId = Guid.NewGuid();
         companyServiceMock.Setup(x => x.DeleteCompany(companyId)).ReturnsAsync(true);
-        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId });
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = companyId, TenantId = tenantId, Name = "test", });
 
         //Act
         var result = await controller.Delete(tenantId, companyId);
@@ -155,7 +157,7 @@ public class CompanyControllerTest
         //Arrange
         var controller = CreateController();
         companyServiceMock.Setup(x => x.DeleteCompany(It.IsAny<Guid>())).ReturnsAsync(false);
-        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid() });
+        companyServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company { Id = Guid.NewGuid(), Name = "test", });
 
         //Act
         var result = await controller.Delete(Guid.NewGuid(), Guid.NewGuid());
@@ -172,6 +174,7 @@ public class CompanyControllerTest
         var company = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             TenantId = Guid.NewGuid(),
         };
         var controller = CreateController();

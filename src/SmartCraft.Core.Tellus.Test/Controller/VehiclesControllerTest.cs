@@ -22,6 +22,7 @@ public class VehiclesControllerTest
         var tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             TenantId = Guid.NewGuid(),
             VolvoCredentials = ""
         };
@@ -59,7 +60,7 @@ public class VehiclesControllerTest
     {
         // Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company());
+        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company() { Name = "test" });
         vehicleServiceMock.Setup(x => x.GetVehiclesAsync(It.IsAny<string>(), null, It.IsAny<Company>())).ThrowsAsync(new Exception());
 
         // Act
@@ -75,7 +76,7 @@ public class VehiclesControllerTest
     {
         //Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company());
+        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company() { Name = "test"});
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new EsgVehicleReport 
         { 
@@ -117,7 +118,7 @@ public class VehiclesControllerTest
     {
         // Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company());
+        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company() { Name = "test" });
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(null as EsgVehicleReport);
 
@@ -135,7 +136,7 @@ public class VehiclesControllerTest
     {
         // Arrange
         var controller = CreateVehiclesController();
-        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company());
+        tenantServiceMock.Setup(x => x.GetCompanyAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(new Company() { Name = "test" });
         esgServiceMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception());
 
         // Act

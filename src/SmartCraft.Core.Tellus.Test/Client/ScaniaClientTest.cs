@@ -19,6 +19,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };
@@ -86,6 +87,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };
@@ -144,6 +146,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
 
@@ -218,6 +221,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };
@@ -277,6 +281,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };
@@ -358,6 +363,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };
@@ -433,6 +439,7 @@ public class ScaniaClientTest
         Company tenant = new Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             ScaniaClientId = "1234",
             ScaniaSecretKey = "5678"
         };

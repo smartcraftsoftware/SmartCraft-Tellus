@@ -20,7 +20,8 @@ public class EsgServiceTest
         //Arrange
         var tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
@@ -53,7 +54,8 @@ public class EsgServiceTest
         //Arrange
         var tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
@@ -78,7 +80,8 @@ public class EsgServiceTest
         //Arrange
         var tenant = new Company
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "test",
         };
         vehicleClientMock.Setup(x => x.VehicleBrand).Returns(vehicleBrand);
         vehicleClientMock.Setup(x => x.GetEsgReportAsync(It.IsAny<string>(), It.IsAny<Company>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))

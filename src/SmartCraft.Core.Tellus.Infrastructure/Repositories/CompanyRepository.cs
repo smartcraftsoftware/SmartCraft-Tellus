@@ -17,9 +17,4 @@ public class CompanyRepository : Repository<Company, CompanyContext>, ICompanyRe
             .Where(company => company.TenantId == tenantId)
             .ToListAsync();
     }
-
-    public async Task<Company> Get(Guid tenantId, Guid companyId)
-    {
-        return await _entities.Where(t => t.TenantId == tenantId && t.Id == companyId).SingleOrDefaultAsync();
-    }
 }

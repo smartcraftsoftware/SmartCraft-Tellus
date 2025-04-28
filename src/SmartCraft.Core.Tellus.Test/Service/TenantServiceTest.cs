@@ -22,6 +22,7 @@ public class companyServiceTest
         var company = new Infrastructure.Models.Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             TenantId = Guid.NewGuid(),
             DaimlerToken = "Daim",
             ManToken = "Japp",
@@ -59,6 +60,7 @@ public class companyServiceTest
         var company = new Domain.Models.Company()
         {
             TenantId = Guid.NewGuid(),
+            Name = "test",
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).Returns(Task.CompletedTask);
 
@@ -76,6 +78,7 @@ public class companyServiceTest
         var company = new Infrastructure.Models.Company()
         {
             Id = Guid.NewGuid(),
+            Name = "test",
         };
         repositoryMock.Setup(x => x.Add(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new Exception());
 
@@ -92,13 +95,15 @@ public class companyServiceTest
         var company = new Domain.Models.Company()
         {
             Id = companyId,
-            DaimlerToken = "Not Updated"
+            DaimlerToken = "Not Updated",
+            Name = "test",
         };
 
         var updatedcompany = new Infrastructure.Models.Company()
         {
             Id = companyId,
-            DaimlerToken = "Updated"
+            DaimlerToken = "Updated",
+            Name = "test",
         };
 
         repositoryMock.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(company.ToDataModel());
@@ -123,7 +128,7 @@ public class companyServiceTest
         repositoryMock.Setup(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>())).ThrowsAsync(new InvalidOperationException());
 
         //Act and Assert
-        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateCompanyAsync(new Domain.Models.Company()));
+        Task<InvalidOperationException> exc = Assert.ThrowsAsync<InvalidOperationException>(async () => await service.UpdateCompanyAsync(new Domain.Models.Company() { Name = "test" }));
         repositoryMock.Verify(x => x.Get(It.IsAny<Guid>()), Times.Once);
         repositoryMock.Verify(x => x.Update(It.IsAny<Infrastructure.Models.Company>(), It.IsAny<Guid>()), Times.Never);
     }

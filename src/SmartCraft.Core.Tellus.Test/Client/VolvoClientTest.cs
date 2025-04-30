@@ -23,6 +23,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         handlerMock.Protected().Setup<Task<HttpResponseMessage>>
@@ -75,6 +76,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         handlerMock.Protected().Setup<Task<HttpResponseMessage>>
@@ -124,6 +126,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         handlerMock.Protected().Setup<Task<HttpResponseMessage>>
@@ -170,6 +173,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         handlerMock.Protected().Setup<Task<HttpResponseMessage>>
@@ -204,6 +208,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         VehicleStatus vehicleStatus = new VehicleStatus()
@@ -257,6 +262,7 @@ public class VolvoClientTest
         Company tenant = new Company
         {
             Id = Guid.NewGuid(),
+            Name = "test",
             VolvoCredentials = "credentials"
         };
         handlerMock.Protected().Setup<Task<HttpResponseMessage>>

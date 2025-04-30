@@ -38,6 +38,8 @@ public class CompanyService(ICompanyRepository<Infrastructure.Models.Company, Co
             throw new InvalidOperationException("TenantCompany not found");
         }
 
+        if(company.Name != null)
+            existingCompany.Name = company.Name;
         if (company.DaimlerToken != null)
             existingCompany.DaimlerToken = company.DaimlerToken;
         if (company.ManToken != null)

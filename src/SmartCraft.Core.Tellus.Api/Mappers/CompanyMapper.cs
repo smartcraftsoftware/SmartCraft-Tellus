@@ -11,6 +11,7 @@ public static class CompanyMapper
         {
             CompanyId = company.Id,
             TenantId = company.TenantId,
+            Name = company.Name,
             DaimlerToken = company.DaimlerToken,
             ManToken = company.ManToken,
             ScaniaSecretKey = company.ScaniaSecretKey,
@@ -23,6 +24,7 @@ public static class CompanyMapper
     {
         return new Domain.Models.Company
         {
+            Name = companyRequest.Name,
             TenantId = companyRequest.TenantId,
             DaimlerToken = companyRequest.DaimlerToken,
             ManToken = companyRequest.ManToken,
@@ -37,6 +39,7 @@ public static class CompanyMapper
         return new Domain.Models.Company
         {
             Id = companyId,
+            Name = companyRequest.Name,
             DaimlerToken = companyRequest.DaimlerToken,
             ManToken = companyRequest.ManToken,
             ScaniaSecretKey = companyRequest.ScaniaSecretKey,

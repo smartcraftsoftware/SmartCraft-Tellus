@@ -9,6 +9,7 @@ public static class CompanyMapper
         {
             Id = company.Id,
             TenantId = company.TenantId,
+            Name = company.Name,
             VolvoCredentials = company.VolvoCredentials,
             ScaniaSecretKey = company.ScaniaSecretKey,
             ScaniaClientId = company.ScaniaClientId,
@@ -24,6 +25,7 @@ public static class CompanyMapper
         {
             Id = company.Id,
             TenantId = company.TenantId,
+            Name = company.Name,
             VolvoCredentials = company.VolvoCredentials,
             ScaniaClientId = company.ScaniaClientId,
             ScaniaSecretKey = company.ScaniaSecretKey,
@@ -37,6 +39,7 @@ public static class CompanyMapper
         return new Company
         {
             Id = Guid.NewGuid(),
+            Name = company.Name,
             TenantId = tenantId,
             VolvoCredentials = company.VolvoCredentials,
             ScaniaClientId = company.ScaniaClientId,

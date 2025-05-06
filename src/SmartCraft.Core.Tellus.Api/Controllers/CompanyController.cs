@@ -40,7 +40,7 @@ public class CompanyController : ControllerBase
                 return NotFound("Could not find company.");
             }
 
-            return Ok(company);
+            return Ok(company.ToResponseContract());
         }
         catch (Exception ex)
         {

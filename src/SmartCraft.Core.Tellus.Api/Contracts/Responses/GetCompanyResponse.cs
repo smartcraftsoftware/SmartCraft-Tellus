@@ -2,7 +2,7 @@
 
 public class GetCompanyResponse
 {
-    public Guid CompanyId { get; set; }
+    public Guid Id { get; set; }
     public Guid TenantId { get; set; }
     public required string Name { get; set; }
     public string? DaimlerToken { get; set; }

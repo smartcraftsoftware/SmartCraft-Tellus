@@ -39,12 +39,12 @@ public static class CompanyMapper
         return new Domain.Models.Company
         {
             Id = companyId,
-            Name = companyRequest.Name,
-            DaimlerToken = companyRequest.DaimlerToken,
-            ManToken = companyRequest.ManToken,
-            ScaniaSecretKey = companyRequest.ScaniaSecretKey,
-            ScaniaClientId = companyRequest.ScaniaClientId,
-            VolvoCredentials = companyRequest.VolvoCredentials
+            Name = companyRequest?.Name,
+            DaimlerToken = companyRequest?.DaimlerToken,
+            ManToken = companyRequest?.ManToken,
+            ScaniaSecretKey = companyRequest?.ScaniaSecretKey,
+            ScaniaClientId = companyRequest?.ScaniaClientId,
+            VolvoCredentials = companyRequest?.VolvoCredentials
         };
     }
 }

@@ -97,8 +97,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
             { "vin", vin },
             { "starttime", startTime.ToIso8601() },
             { "stoptime", stopTime.ToIso8601() },
-            { "triggerFilter", "TIMER" },
-            { "contentFilter", "SNAPSHOT" },
+            { "contentFilter", "ACCUMULATED" },
             { "datetype", "received" }
         };
         var uriBuilder = ClientHelpers.BuildUri("https://dataaccess.scania.com", "rfms4/vehiclestatuses", param);

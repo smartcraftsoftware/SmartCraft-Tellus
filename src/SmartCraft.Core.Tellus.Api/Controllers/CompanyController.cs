@@ -54,6 +54,7 @@ public class CompanyController : ControllerBase
     /// </summary>
     /// <param name="tenantId"></param>
     /// <returns></returns>
+    [HttpGet]
     public async Task<ActionResult<List<GetCompanyResponse>>> Get([FromHeader]Guid tenantId)
     {
         try

@@ -97,7 +97,6 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
             { "vin", vin },
             { "starttime", startTime.ToIso8601() },
             { "stoptime", stopTime.ToIso8601() },
-            { "triggerFilter", "TIMER" },
             { "contentFilter", "SNAPSHOT" },
             { "datetype", "received" }
         };

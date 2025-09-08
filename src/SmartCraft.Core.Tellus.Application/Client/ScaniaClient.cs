@@ -118,7 +118,11 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         response.EnsureSuccessStatusCode();
         string responseContent = await response.Content.ReadAsStringAsync();
+
         var scaniaVehicleStatusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
+        if (scaniaVehicleStatusResponse.VehicleStatusResponse.VehicleStatuses.Length == 0)
+            return null;
+
         if (scaniaVehicleStatusResponse.MoreDataAvailable && scaniaVehicleStatusResponse?.VehicleStatusResponse?.VehicleStatuses?.Length > 0)
         {
             bool moreDataAvailable = true;

@@ -127,6 +127,10 @@ public class VehiclesController : ControllerBase
             }
 
             var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
+            if (statusReport == null)
+            {
+                return NoContent();
+            }
             return Ok(statusReport.ToIntervalRespone());
         }
         catch (HttpRequestException ex)

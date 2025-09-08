@@ -43,7 +43,8 @@ public class VehiclesService : IVehiclesService
 
         var vehicleIntervalStatus = await clientDictionary[vehicleBrand.ToLower()].GetVehicleStatusAsync(vin, tenant, start, stop);
 
-        await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
+        if(vehicleIntervalStatus != null)
+            await _intervalStatusRepository.Add(vehicleIntervalStatus.ToDataModel(), tenant.Id);
 
         return vehicleIntervalStatus;
     }

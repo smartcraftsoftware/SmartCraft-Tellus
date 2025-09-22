@@ -86,7 +86,8 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         : vehicles.Select(v => v.ToDomainModel()).ToList();
     }
 
-    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime) {
+    public async Task<IntervalStatusReport> GetVehicleStatusAsync(string vin, Company tenant, DateTime startTime, DateTime stopTime) 
+    {
 
         TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)
@@ -120,6 +121,8 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
             throw new HttpRequestException("Volvo: could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+        if (response.StatusCode == HttpStatusCode.Forbidden)
+            throw new UnauthorizedAccessException("Access to the requested resource is forbidden");
         #pragma warning restore CS8603 // Possible null reference return.
 
         response.EnsureSuccessStatusCode();

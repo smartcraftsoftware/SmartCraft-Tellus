@@ -133,6 +133,11 @@ public class VehiclesController : ControllerBase
             }
             return Ok(statusReport.ToIntervalRespone());
         }
+        catch(UnauthorizedAccessException ex)
+        {
+            _logger.Error("Unauthorized attempt to fetch vehicle report with error: {error}", ex);
+            return Unauthorized("Access to the requested resource is forbidden");
+        }
         catch (HttpRequestException ex)
         {
             _logger.Error("The vehicle client threw an HTTP request {Exception}", ex);

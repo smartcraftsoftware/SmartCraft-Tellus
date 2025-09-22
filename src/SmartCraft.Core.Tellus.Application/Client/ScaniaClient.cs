@@ -114,6 +114,8 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
             throw new HttpRequestException("Could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+        if (response.StatusCode == HttpStatusCode.Forbidden)
+            throw new UnauthorizedAccessException("Access to the requested resource is forbidden");
 #pragma warning restore CS8603 // Possible null reference return.
 
         response.EnsureSuccessStatusCode();

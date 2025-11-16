@@ -3,6 +3,7 @@ using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Utility;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
+using SmartCraft.Core.Tellus.Domain.Exceptions;
 using System;
 using System.Net;
 using System.Security.Cryptography;
@@ -40,7 +41,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
             return null;
         #pragma warning restore CS8603
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -68,13 +69,11 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 
         #pragma warning disable CS8603 // Possible null reference return.
         var response = await client.SendAsync(request);
-        if (response.StatusCode == HttpStatusCode.TooManyRequests)
-            throw new HttpRequestException("Too many requests");
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         #pragma warning restore CS8603 // Possible null reference return.
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         var vehicleApiResponse = JsonSerializer.Deserialize<ScaniaVehiclesApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
 
@@ -113,10 +112,10 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
 #pragma warning disable CS8603 // Possible null reference return.
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new HttpRequestException("Could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.NotFound, "Could not find any vehicle statuses for the given vehicle, start and end times");
 #pragma warning restore CS8603 // Possible null reference return.
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
         string responseContent = await response.Content.ReadAsStringAsync();
 
         var scaniaVehicleStatusResponse = JsonSerializer.Deserialize<ScaniaVehicleStatusResponse>(responseContent) ?? throw new JsonException("Could not serialize the object");
@@ -156,7 +155,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         request.Content = new StringContent("clientId=" + tenant.ScaniaClientId, null, "application/x-www-form-urlencoded");
         //Make api request and validate response code
         var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         //Parse response
         var challenge = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
@@ -181,7 +180,7 @@ public class ScaniaClient(HttpClient client) : IVehicleClient
         var content = new StringContent("clientId=" + tenant.ScaniaClientId + "&Response=" + encodedResponse, null, "application/x-www-form-urlencoded");
         request.Content = content;
         response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         var token = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
 

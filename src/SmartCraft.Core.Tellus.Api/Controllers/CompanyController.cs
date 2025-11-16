@@ -32,21 +32,13 @@ public class CompanyController : ControllerBase
     [HttpGet("{companyId}")]
     public async Task<ActionResult<GetCompanyResponse>> Get([FromHeader]Guid tenantId, Guid companyId)
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if(company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if(company == null)
-            {
-                return NotFound("Could not find company.");
-            }
+            return NotFound("Could not find company.");
+        }
 
-            return Ok(company.ToResponseContract());
-        }
-        catch (Exception ex)
-        {
-            _logger.Error("Error getting {Company} with {Exception}", companyId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        return Ok(company.ToResponseContract());
     }
 
     /// <summary>
@@ -57,21 +49,13 @@ public class CompanyController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<GetCompanyResponse>>> Get([FromHeader]Guid tenantId)
     {
-        try
+        var companies = await _companyService.GetCompaniesAsync(tenantId);
+        if(companies.Count == 0 || companies == null)
         {
-            var companies = await _companyService.GetCompaniesAsync(tenantId);
-            if(companies.Count == 0 || companies == null)
-            {
-                return NotFound("Could not find any companies.");
-            }
+            return NotFound("Could not find any companies.");
+        }
 
-            return Ok(companies.Select(x => x.ToResponseContract()));
-        }
-        catch (Exception ex)
-        {
-            _logger.Error("Error getting companies for {Tenant} with {Exception}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        return Ok(companies.Select(x => x.ToResponseContract()));
     }
 
     /// <summary>
@@ -85,15 +69,7 @@ public class CompanyController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Guid>> Post([FromHeader]Guid tenantId, [FromBody]AddCompanyRequest companyRequest)
     {
-        try
-        {
-            return Ok(await _companyService.RegisterCompanyAsync(tenantId, companyRequest.ToDomainModel()));
-        }
-        catch (Exception ex)
-        {
-            _logger.Error("Error creating tenant with {Exception}", ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        return Ok(await _companyService.RegisterCompanyAsync(tenantId, companyRequest.ToDomainModel()));
     }
 
     /// <summary>
@@ -108,22 +84,15 @@ public class CompanyController : ControllerBase
     [HttpPatch("{companyId}")]
     public async Task<ActionResult> Patch([FromHeader]Guid tenantId, Guid companyId, [FromBody]UpdateCompanyRequest companyRequest)
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if (company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if (company == null)
-            {
-                return NotFound("Could not find company.");
-            }
-            var companyUpdateValues = companyRequest.ToDomainModel(companyId);
-            var updatedCompany = await _companyService.UpdateCompanyAsync(companyUpdateValues);
-            return Ok(updatedCompany);
+            return NotFound("Could not find company.");
         }
-        catch (Exception ex)
-        {
-            _logger.Error( "Error updating Company with {Exception}", ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        
+        var companyUpdateValues = companyRequest.ToDomainModel(companyId);
+        var updatedCompany = await _companyService.UpdateCompanyAsync(companyUpdateValues);
+        return Ok(updatedCompany);
     }
 
     /// <summary>
@@ -138,24 +107,17 @@ public class CompanyController : ControllerBase
     [HttpDelete("{companyId}")]
     public async Task<ActionResult> Delete([FromHeader]Guid tenantId, Guid companyId)
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if (company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if (company == null)
-            {
-                return NotFound("Could not find company.");
-            }
+            return NotFound("Could not find company.");
+        }
 
-            if (await _companyService.DeleteCompany(companyId))
-            {
-                return NoContent();
-            }
-            return NotFound();
-        }
-        catch (Exception ex)
+        if (await _companyService.DeleteCompany(companyId))
         {
-            _logger.Error("Error deleting {Company} with {Exception}", companyId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
+            return NoContent();
         }
+        
+        return NotFound();
     }
 }

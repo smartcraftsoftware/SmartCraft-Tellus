@@ -4,6 +4,7 @@ using SmartCraft.Core.Tellus.Domain.Models;
 using SmartCraft.Core.Tellus.Domain.Utility;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
+using SmartCraft.Core.Tellus.Domain.Exceptions;
 
 namespace SmartCraft.Core.Tellus.Infrastructure.Client;
 
@@ -19,7 +20,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         
         var credentials = tenant.VolvoCredentials ?? "";
         if (string.IsNullOrEmpty(credentials))
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.Unauthorized, "Volvo credentials not configured");
 
         var baseEncoded = CredentialsAsB64String(credentials);
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
@@ -35,7 +36,8 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         if(response.StatusCode == HttpStatusCode.NotFound)
             return null;
         #pragma warning restore CS8603 // Possible null reference return.
-        response.EnsureSuccessStatusCode();
+        
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -51,7 +53,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         var uriBuilder = ClientHelpers.BuildUri("https://api.volvotrucks.com", $"/rfms/vehicles");
         var credentials = tenant?.VolvoCredentials ?? "";
         if (string.IsNullOrEmpty(credentials))
-            throw new HttpRequestException(HttpStatusCode.Unauthorized.ToString());
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.Unauthorized, "Volvo credentials not configured");
 
         var baseEncoded = CredentialsAsB64String(credentials);
 
@@ -65,12 +67,11 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
         #pragma warning disable CS8603 // Possible null reference return.
         var response = await client.SendAsync(request);
-        var result = await response.Content.ReadAsStringAsync();
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         #pragma warning restore CS8603 // Possible null reference return.
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         var options = new JsonSerializerOptions
         {
@@ -90,7 +91,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
 
         TimeSpan ts = DateTime.UtcNow - startTime;
         if (ts.TotalDays >= 14)
-            throw new HttpRequestException("Volvo: only the last 14 days are available!", null, HttpStatusCode.BadRequest);
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.BadRequest, "Volvo: only the last 14 days are available!");
 
         var param = new Dictionary<string, string>
         {
@@ -106,7 +107,7 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         var credentials = tenant?.VolvoCredentials ?? "";
 
         if (string.IsNullOrEmpty(credentials))
-            throw new UnauthorizedAccessException();
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.Unauthorized, "Volvo credentials not configured");
 
         Dictionary<string, string> headerKeyValues = new Dictionary<string, string>
         {
@@ -119,10 +120,10 @@ public class VolvoClient(HttpClient client) : IVehicleClient
         #pragma warning disable CS8603 // Possible null reference return.
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new HttpRequestException("Volvo: could not find any vehicle statuses for the given vehicle, start and end times", null, HttpStatusCode.NotFound);
+            throw new VehicleApiException(VehicleBrand, HttpStatusCode.NotFound, "Volvo: could not find any vehicle statuses for the given vehicle, start and end times");
         #pragma warning restore CS8603 // Possible null reference return.
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
         string responseContent = await response.Content.ReadAsStringAsync();
 
         var options = new JsonSerializerOptions

@@ -12,6 +12,7 @@ using SmartCraft.Core.Tellus.Application.Client;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using SmartCraft.Core.Tellus.Domain.Validators;
+using SmartCraft.Core.Tellus.Api.Filters;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +34,11 @@ builder.Logging.ClearProviders();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(logger, dispose: true));
 
 builder.Services.AddHealthChecks();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionFilter>();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swaggerGenOptions =>

@@ -5,6 +5,7 @@ using SmartCraft.Core.Tellus.Infrastructure.Client;
 using SmartCraft.Core.Tellus.Infrastructure.Mappers;
 using System.Net;
 using System.Text.Json;
+using SmartCraft.Core.Tellus.Domain.Exceptions;
 
 namespace SmartCraft.Core.Tellus.Application.Client;
 public class ManClient(HttpClient client) : IVehicleClient
@@ -29,7 +30,8 @@ public class ManClient(HttpClient client) : IVehicleClient
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         #pragma warning restore CS8603
-        response.EnsureSuccessStatusCode();
+        
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         var jsonObject = JsonSerializer.Deserialize<ManPerformApiResponse>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
 
@@ -57,8 +59,9 @@ public class ManClient(HttpClient client) : IVehicleClient
         #pragma warning disable CS8603
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
-        response.EnsureSuccessStatusCode();
         #pragma warning restore CS8603
+        
+        await response.EnsureSuccessOrThrowVehicleApiException(VehicleBrand);
 
         var jsonObject = JsonSerializer.Deserialize<List<ManAssetApiResponse>>(await response.Content.ReadAsStringAsync()) ?? throw new JsonException();
 

@@ -6,6 +6,7 @@ using SmartCraft.Core.Tellus.Domain.Models;
 using Moq.Protected;
 using System.Text.Json;
 using SmartCraft.Core.Tellus.Infrastructure.ApiResponse;
+using SmartCraft.Core.Tellus.Domain.Exceptions;
 
 namespace SmartCraft.Core.Tellus.Test.Client;
 public class ScaniaClientTest
@@ -129,8 +130,9 @@ public class ScaniaClientTest
         Func<Task> action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
         
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("scania");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -264,8 +266,9 @@ public class ScaniaClientTest
         var result = () => client.GetVehiclesAsync(tenant, null);
         
         //Assert
-        var exception = await result.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await result.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("scania");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Exactly(3),
@@ -422,8 +425,9 @@ public class ScaniaClientTest
         var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("scania");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync", 
             Times.Once(), 
@@ -500,8 +504,9 @@ public class ScaniaClientTest
         var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
         
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        exception.Which.VehicleBrand.Should().Be("scania");
     }
 
     private ScaniaClient CreateClient(HttpClient client)

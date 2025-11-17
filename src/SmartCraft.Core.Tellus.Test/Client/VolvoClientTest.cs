@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.Json;
 using SmartCraft.Core.Tellus.Domain.Models;
 using FluentAssertions;
+using SmartCraft.Core.Tellus.Domain.Exceptions;
 
 namespace SmartCraft.Core.Tellus.Test.Client;
 public class VolvoClientTest
@@ -109,8 +110,9 @@ public class VolvoClientTest
         var action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("volvo");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -188,11 +190,12 @@ public class VolvoClientTest
         var client = CreateVolvoClient(httpClient);
 
         //Act
-        var action = () => client.GetEsgReportAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+        var action = () => client.GetVehiclesAsync(tenant, null);
 
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("volvo");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),
@@ -289,8 +292,9 @@ public class VolvoClientTest
         var action = () => client.GetVehicleStatusAsync("thisisavin", tenant, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
         //Assert
-        var exception = await action.Should().ThrowAsync<HttpRequestException>();
-        exception.And.StatusCode.Should().Be(statusCode);
+        var exception = await action.Should().ThrowAsync<VehicleApiException>();
+        exception.Which.StatusCode.Should().Be(statusCode);
+        exception.Which.VehicleBrand.Should().Be("volvo");
         handlerMock.Protected().Verify<Task<HttpResponseMessage>>(
             "SendAsync",
             Times.Once(),

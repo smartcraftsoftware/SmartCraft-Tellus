@@ -41,26 +41,17 @@ public class VehiclesController : ControllerBase
     [HttpGet("{companyId}/{vehicleBrand}/vehicles")]
     public async Task<ActionResult<List<GetVehicleResponse>>> GetVehiclesAsync(string vehicleBrand, string? vin, [FromHeader]Guid tenantId, Guid companyId)
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if (company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if (company == null)
-            {
-                return NotFound("Could not find tenant");
-            }
-
-            var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, company);
-            if (vehicles == null || vehicles.Count == 0)
-                return NoContent();
-
-
-            return Ok(vehicles.Select(x => x.ToVehicleResponse()));
+            return NotFound("Could not find tenant");
         }
-        catch (Exception ex)
-        {
-            _logger.Error("Error getting vehicles for tenant {tenantId} with {Exception}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+
+        var vehicles = await _vehicleService.GetVehiclesAsync(vehicleBrand, vin, company);
+        if (vehicles == null || vehicles.Count == 0)
+            return NoContent();
+
+        return Ok(vehicles.Select(x => x.ToVehicleResponse()));
     }
 
     /// <summary>
@@ -80,26 +71,19 @@ public class VehiclesController : ControllerBase
     [HttpGet("{companyId}/{vehicleBrand}/report")]
     public async Task<ActionResult<VehicleEvaluationReportResponse>> GetReportAsync(string vehicleBrand, string? vinOrId, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId)
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if (company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if (company == null)
-            {
-                return NotFound("Could not find tenant");
-            }
-            var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
-            if (vehicle == null)
-            {
-                return NoContent();
-            }
+            return NotFound("Could not find tenant");
+        }
+        
+        var vehicle = await _esgService.GetEsgReportAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
+        if (vehicle == null)
+        {
+            return NoContent();
+        }
 
-            return Ok(vehicle.ToResponse());
-        }
-        catch (Exception ex)
-        {
-            _logger.Error("Error getting report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        return Ok(vehicle.ToResponse());
     }
 
     /// <summary>
@@ -118,30 +102,18 @@ public class VehiclesController : ControllerBase
     [HttpGet("{companyId}/{vehicleBrand}/vehiclestatus")]
     public async Task<ActionResult<IntervalStatusReportResponse>> GetVehicleStatusReport(string vehicleBrand, DateTime startTime, DateTime stopTime, [FromHeader] Guid tenantId, Guid companyId, string vinOrId = "")
     {
-        try
+        var company = await _companyService.GetCompanyAsync(companyId, tenantId);
+        if (company == null)
         {
-            var company = await _companyService.GetCompanyAsync(companyId, tenantId);
-            if (company == null)
-            {
-                return NotFound("Could not find tenant");
-            }
+            return NotFound("Could not find tenant");
+        }
 
-            var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
-            if (statusReport == null)
-            {
-                return NoContent();
-            }
-            return Ok(statusReport.ToIntervalRespone());
-        }
-        catch (HttpRequestException ex)
+        var statusReport = await _vehicleService.GetVehicleStatusAsync(vehicleBrand, vinOrId, company, startTime, stopTime);
+        if (statusReport == null)
         {
-            _logger.Error("The vehicle client threw an HTTP request {Exception}", ex);
-            return StatusCode((int)ex.StatusCode, "An error occured when making the request");
+            return NoContent();
         }
-        catch (Exception ex)
-        {
-            _logger.Error("Error getting vehicle status report for {Tenant} with {ErrorMessage}", tenantId, ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occured when making the request");
-        }
+        
+        return Ok(statusReport.ToIntervalRespone());
     }
 }
